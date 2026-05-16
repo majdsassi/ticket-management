@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Ticket System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { @apply bg-slate-50 text-slate-900; }
+        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
+        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
+        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
+                <div class="flex items-center space-x-4">
+                    <span th:text="'Admin: ' + ${#authentication.principal.fullName}" class="text-sm"></span>
+                    <form action="/logout" method="post" style="display: inline;">
+                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md min-h-screen">
+            <div class="p-6">
+                <nav class="space-y-2">
+                    <a href="/dashboard" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
+                        📊 Dashboard
+                    </a>
+                    <a href="/tickets" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        🎫 All Tickets
+                    </a>
+                    <hr class="my-4">
+                    <h3 class="text-sm font-bold text-slate-600 mb-3">Admin Tools</h3>
+                    <a href="#users" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        👥 Manage Users
+                    </a>
+                    <a href="#projects" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        📁 Manage Projects
+                    </a>
+                    <a href="#statistics" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        📈 Statistics
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
+                <p class="text-slate-600">System overview and management tools</p>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-600 text-sm font-medium">Total Users</p>
+                            <p class="text-3xl font-bold text-navy" th:text="${totalUsers}">0</p>
+                        </div>
+                        <span class="text-4xl">👥</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-600 text-sm font-medium">Projects</p>
+                            <p class="text-3xl font-bold text-blue-600" th:text="${totalProjects}">0</p>
+                        </div>
+                        <span class="text-4xl">📁</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-600 text-sm font-medium">Open Tickets</p>
+                            <p class="text-3xl font-bold text-red-600" th:text="${openTickets}">0</p>
+                        </div>
+                        <span class="text-4xl">🔴</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-600 text-sm font-medium">System Health</p>
+                            <p class="text-3xl font-bold text-green-600">98%</p>
+                        </div>
+                        <span class="text-4xl">💚</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Statistics -->
+            <div class="card mb-8">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">User Distribution by Role</h2>
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="p-6 bg-blue-50 rounded-lg">
+                        <p class="text-slate-600 text-sm mb-2">Customers</p>
+                        <p class="text-3xl font-bold text-blue-600" th:text="${allUsers.stream().filter(u -> u.role.name() == 'CUSTOMER').count()}">0</p>
+                    </div>
+                    <div class="p-6 bg-purple-50 rounded-lg">
+                        <p class="text-slate-600 text-sm mb-2">Support Agents</p>
+                        <p class="text-3xl font-bold text-purple-600" th:text="${allUsers.stream().filter(u -> u.role.name() == 'CUSTOMER_SUPPORT').count()}">0</p>
+                    </div>
+                    <div class="p-6 bg-amber-50 rounded-lg">
+                        <p class="text-slate-600 text-sm mb-2">Admins</p>
+                        <p class="text-3xl font-bold text-amber-600" th:text="${allUsers.stream().filter(u -> u.role.name() == 'ADMIN').count()}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Users -->
+            <div id="users" class="card mb-8">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">All Users</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200">
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Name</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Email</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Role</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Status</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${allUsers}" class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium" th:text="${user.fullName}"></td>
+                                <td class="py-3 px-4 text-slate-600" th:text="${user.email}"></td>
+                                <td class="py-3 px-4">
+                                    <span th:if="${user.role.name() == 'ADMIN'}" class="inline-block bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-xs font-medium">Admin</span>
+                                    <span th:if="${user.role.name() == 'CUSTOMER_SUPPORT'}" class="inline-block bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium">Support</span>
+                                    <span th:if="${user.role.name() == 'CUSTOMER'}" class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">Customer</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span th:if="${user.active}" class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium">Active</span>
+                                    <span th:unless="${user.active}" class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-medium">Inactive</span>
+                                </td>
+                                <td class="py-3 px-4 text-slate-600 text-xs" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div id="projects" class="card mb-8">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">Manage Projects</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200">
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Project Name</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Description</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Tickets</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="project : ${projects}" class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium" th:text="${project.name}"></td>
+                                <td class="py-3 px-4 text-slate-600" th:text="${project.description}"></td>
+                                <td class="py-3 px-4 text-slate-600" th:text="${project.tickets.size()}"></td>
+                            </tr>
+                            <tr th:if="${projects.isEmpty()}">
+                                <td colspan="3" class="py-8 px-4 text-center text-slate-600">No projects yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ticket Statistics -->
+            <div id="statistics" class="card">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">Ticket Statistics</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="p-6 border border-slate-200 rounded-lg">
+                        <p class="text-slate-600 text-sm mb-2">Total Tickets</p>
+                        <p class="text-2xl font-bold" th:text="${allTickets.size()}">0</p>
+                    </div>
+                    <div class="p-6 border border-slate-200 rounded-lg">
+                        <p class="text-slate-600 text-sm mb-2">Open</p>
+                        <p class="text-2xl font-bold text-blue-600" th:text="${allTickets.stream().filter(t -> t.status.name() == 'OPEN').count()}">0</p>
+                    </div>
+                    <div class="p-6 border border-slate-200 rounded-lg">
+                            <p class="text-slate-600 text-sm mb-2">In Progress</p>
+                            <p class="text-2xl font-bold text-yellow-600" th:text="${allTickets.stream().filter(t -> t.status.name() == 'IN_PROGRESS').count()}">0</p>
+                    </div>
+                    <div class="p-6 border border-slate-200 rounded-lg">
+                        <p class="text-slate-600 text-sm mb-2">Resolved</p>
+                        <p class="text-2xl font-bold text-green-600" th:text="${allTickets.stream().filter(t -> t.status.name() == 'RESOLVED').count()}">0</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

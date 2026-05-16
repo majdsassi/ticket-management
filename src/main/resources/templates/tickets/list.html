@@ -1,15 +1,136 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Tickets</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Tickets - Ticket System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { @apply bg-slate-50 text-slate-900; }
+        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
+        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
+        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
+        .badge { @apply inline-block px-3 py-1 rounded-full text-sm font-medium; }
+        .badge-open { @apply bg-blue-50 text-blue-700; }
+        .badge-assigned { @apply bg-yellow-50 text-yellow-700; }
+        .badge-resolved { @apply bg-green-50 text-green-700; }
+        .badge-urgent { @apply bg-red-50 text-red-700; }
+    </style>
 </head>
 <body>
-<h1>Tickets</h1>
-<a href="/tickets/new">Create ticket</a>
-<ul>
-    <li th:each="t : ${tickets}">
-        <a th:href="@{'/tickets/' + ${t.id}}" th:text="${t.title}"></a>
-    </li>
-</ul>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
+                <div class="flex items-center space-x-4">
+                    <span th:text="${#authentication.principal.fullName}" class="text-sm"></span>
+                    <form action="/logout" method="post" style="display: inline;">
+                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md min-h-screen">
+            <div class="p-6">
+                <nav class="space-y-2">
+                    <a href="/dashboard" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        📊 Dashboard
+                    </a>
+                    <a href="/tickets" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
+                        🎫 Tickets
+                    </a>
+                    <a href="/tickets/new" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        ➕ New Ticket
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-4xl font-bold text-slate-900">Tickets</h1>
+                    <a href="/tickets/new" class="btn-primary">➕ New Ticket</a>
+                </div>
+                <p class="text-slate-600">Manage your support tickets</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-8">
+                <form method="get" action="/tickets" class="flex gap-4 items-end flex-wrap">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Filter by Status</label>
+                        <select name="status" class="px-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Statuses</option>
+                            <option th:each="status : ${statuses}" th:value="${status.name()}" th:text="${status.name()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Filter by Project</label>
+                        <select name="projectId" class="px-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Projects</option>
+                            <option th:each="project : ${projects}" th:value="${project.id}" th:text="${project.name}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Filter</button>
+                </form>
+            </div>
+
+            <!-- Tickets Table -->
+            <div class="card">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-slate-200">
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">ID</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Title</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Project</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Reporter</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Status</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Priority</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Created</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="ticket : ${tickets}" class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                <td class="py-3 px-4 text-slate-600 font-mono" th:text="'#' + ${ticket.id}"></td>
+                                <td class="py-3 px-4 font-medium" th:text="${ticket.title}"></td>
+                                <td class="py-3 px-4 text-slate-600" th:text="${ticket.project.name}"></td>
+                                <td class="py-3 px-4 text-slate-600" th:text="${ticket.reporter.fullName}"></td>
+                                <td class="py-3 px-4">
+                                    <span th:if="${ticket.status.name() == 'OPEN'}" class="badge badge-open">Open</span>
+                                        <span th:if="${ticket.status.name() == 'IN_PROGRESS'}" class="badge badge-assigned">In Progress</span>
+                                    <span th:if="${ticket.status.name() == 'RESOLVED'}" class="badge badge-resolved">Resolved</span>
+                                    <span th:if="${ticket.status.name() == 'CLOSED'}" class="badge bg-slate-100 text-slate-700">Closed</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span th:if="${ticket.priority.name() == 'URGENT'}" class="badge badge-urgent">Urgent</span>
+                                    <span th:if="${ticket.priority.name() == 'HIGH'}" class="badge bg-orange-50 text-orange-700">High</span>
+                                    <span th:if="${ticket.priority.name() == 'MEDIUM'}" class="badge bg-yellow-50 text-yellow-700">Medium</span>
+                                    <span th:if="${ticket.priority.name() == 'LOW'}" class="badge bg-green-50 text-green-700">Low</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-slate-600" th:text="${#temporals.format(ticket.createdAt, 'MMM dd')}"></td>
+                                <td class="py-3 px-4">
+                                    <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">View →</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${tickets.isEmpty()}">
+                                <td colspan="8" class="py-8 px-4 text-center text-slate-600">
+                                    No tickets found. <a href="/tickets/new" class="text-blue-600 hover:text-blue-800 font-medium">Create one</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

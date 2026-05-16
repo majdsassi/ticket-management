@@ -1,51 +1,105 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Create/Edit Ticket</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ticket - Ticket System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { @apply bg-slate-50 text-slate-900; }
+        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
+        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
+        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
+        .input-field { @apply w-full px-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500; }
+    </style>
 </head>
 <body>
-<h1 th:if="${ticket.id == null}">Create Ticket</h1>
-<h1 th:if="${ticket.id != null}">Edit Ticket</h1>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
+                <div class="flex items-center space-x-4">
+                    <span th:text="${#authentication.principal.fullName}" class="text-sm"></span>
+                    <form action="/logout" method="post" style="display: inline;">
+                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<form th:action="@{/tickets}" method="post" th:object="${ticket}">
-    <input type="hidden" th:field="*{id}"/>
-    
-    <label>Title:</label>
-    <input type="text" th:field="*{title}" required/><br/>
-    
-    <label>Description:</label>
-    <textarea th:field="*{description}"></textarea><br/>
-    
-    <label>Project:</label>
-    <select th:field="*{project}" required>
-        <option value="">-- Select Project --</option>
-        <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.name}"></option>
-    </select><br/>
-    
-    <label>Reporter:</label>
-    <select th:field="*{reporter}" required>
-        <option value="">-- Select Reporter --</option>
-        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.fullName}"></option>
-    </select><br/>
-    
-    <label>Assignee:</label>
-    <select th:field="*{assignee}">
-        <option value="">-- Unassigned --</option>
-        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.fullName}"></option>
-    </select><br/>
-    
-    <label>Status:</label>
-    <select th:field="*{status}">
-        <option th:each="status : ${T(com.example.project.model.TicketStatus).values()}" th:value="${status}" th:text="${status}"></option>
-    </select><br/>
-    
-    <label>Priority:</label>
-    <select th:field="*{priority}">
-        <option th:each="priority : ${T(com.example.project.model.TicketPriority).values()}" th:value="${priority}" th:text="${priority}"></option>
-    </select><br/>
-    
-    <button type="submit">Save</button>
-    <a href="/tickets">Cancel</a>
-</form>
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md min-h-screen">
+            <div class="p-6">
+                <nav class="space-y-2">
+                    <a href="/dashboard" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        📊 Dashboard
+                    </a>
+                    <a href="/tickets" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
+                        🎫 Tickets
+                    </a>
+                    <a href="/tickets/new" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
+                        ➕ New Ticket
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Create New Ticket</h1>
+                <p class="text-slate-600">Submit a new support ticket</p>
+            </div>
+
+            <div class="card max-w-3xl">
+                <div th:if="${error}" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
+                    ✗ <span th:text="${error}"></span>
+                </div>
+
+                <form method="post" action="/tickets" class="space-y-6">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-slate-700 mb-2">Ticket Title *</label>
+                        <input type="text" id="title" name="title" required 
+                               class="input-field"
+                               placeholder="Brief description of the issue">
+                    </div>
+
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                        <textarea id="description" name="description" rows="6"
+                                  class="input-field"
+                                  placeholder="Detailed description of your issue..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label for="projectId" class="block text-sm font-medium text-slate-700 mb-2">Project *</label>
+                            <select id="projectId" name="projectId" required class="input-field">
+                                <option value="">-- Select Project --</option>
+                                <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.name}"></option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="priority" class="block text-sm font-medium text-slate-700 mb-2">Priority</label>
+                            <select id="priority" name="priority" class="input-field">
+                                <option value="">Select Priority</option>
+                                <option th:each="priority : ${priorities}" th:value="${priority.name()}" th:text="${priority.name()}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 pt-6">
+                        <button type="submit" class="btn-primary">Create Ticket</button>
+                        <a href="/tickets" class="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded-md font-medium transition-colors">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 </body>
+</html>
 </html>
