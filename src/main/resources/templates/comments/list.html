@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Comments</title>
+</head>
+<body>
+<h1>Comments</h1>
+<ul>
+    <li th:each="c : ${comments}">
+        <p th:text="${c.message}"></p>
+        <p>By: <span th:text="${c.author.fullName}"></span></p>
+        <p>On ticket: <a th:href="@{'/tickets/' + ${c.ticket.id}}" th:text="${c.ticket.title}"></a></p>
+    </li>
+</ul>
+</body>
+</html>

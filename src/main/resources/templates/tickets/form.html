@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create/Edit Ticket</title>
+</head>
+<body>
+<h1 th:if="${ticket.id == null}">Create Ticket</h1>
+<h1 th:if="${ticket.id != null}">Edit Ticket</h1>
+
+<form th:action="@{/tickets}" method="post" th:object="${ticket}">
+    <input type="hidden" th:field="*{id}"/>
+    
+    <label>Title:</label>
+    <input type="text" th:field="*{title}" required/><br/>
+    
+    <label>Description:</label>
+    <textarea th:field="*{description}"></textarea><br/>
+    
+    <label>Project:</label>
+    <select th:field="*{project}" required>
+        <option value="">-- Select Project --</option>
+        <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.name}"></option>
+    </select><br/>
+    
+    <label>Reporter:</label>
+    <select th:field="*{reporter}" required>
+        <option value="">-- Select Reporter --</option>
+        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.fullName}"></option>
+    </select><br/>
+    
+    <label>Assignee:</label>
+    <select th:field="*{assignee}">
+        <option value="">-- Unassigned --</option>
+        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.fullName}"></option>
+    </select><br/>
+    
+    <label>Status:</label>
+    <select th:field="*{status}">
+        <option th:each="status : ${T(com.example.project.model.TicketStatus).values()}" th:value="${status}" th:text="${status}"></option>
+    </select><br/>
+    
+    <label>Priority:</label>
+    <select th:field="*{priority}">
+        <option th:each="priority : ${T(com.example.project.model.TicketPriority).values()}" th:value="${priority}" th:text="${priority}"></option>
+    </select><br/>
+    
+    <button type="submit">Save</button>
+    <a href="/tickets">Cancel</a>
+</form>
+</body>
+</html>

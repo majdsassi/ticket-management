@@ -1,0 +1,55 @@
+Simple Ticket Management System UML (Plain Text)
+
+[AppUser]
+- id: Long
+- fullName: String
+- email: String
+- reportedTickets: List<Ticket>
+- assignedTickets: List<Ticket>
+- comments: List<TicketComment>
+
+[Project]
+- id: Long
+- name: String
+- description: String
+- createdAt: LocalDateTime
+- tickets: List<Ticket>
+
+[Ticket]
+- id: Long
+- title: String
+- description: String
+- status: TicketStatus
+- priority: TicketPriority
+- createdAt: LocalDateTime
+- updatedAt: LocalDateTime
+- project: Project
+- reporter: AppUser
+- assignee: AppUser
+- comments: List<TicketComment>
+
+[TicketComment]
+- id: Long
+- message: String
+- createdAt: LocalDateTime
+- ticket: Ticket
+- author: AppUser
+
+[TicketStatus]
+- OPEN
+- IN_PROGRESS
+- RESOLVED
+- CLOSED
+
+[TicketPriority]
+- LOW
+- MEDIUM
+- HIGH
+- URGENT
+
+Relationships:
+AppUser "1" <-- "*" Ticket : reporter
+AppUser "0..1" <-- "*" Ticket : assignee
+Project "1" <-- "*" Ticket
+Ticket "1" <-- "*" TicketComment
+AppUser "1" <-- "*" TicketComment : author

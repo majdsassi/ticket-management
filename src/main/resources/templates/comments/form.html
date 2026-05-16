@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Comment</title>
+</head>
+<body>
+<h1>Create Comment</h1>
+
+<form th:action="@{/comments}" method="post" th:object="${comment}">
+    <label>Ticket:</label>
+    <select th:field="*{ticket}" required>
+        <option value="">-- Select Ticket --</option>
+        <option th:each="t : ${tickets}" th:value="${t.id}" th:text="${t.title}"></option>
+    </select><br/>
+    
+    <label>Author:</label>
+    <select th:field="*{author}" required>
+        <option value="">-- Select Author --</option>
+        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.fullName}"></option>
+    </select><br/>
+    
+    <label>Message:</label>
+    <textarea th:field="*{message}" required></textarea><br/>
+    
+    <button type="submit">Post Comment</button>
+    <a href="/comments">Cancel</a>
+</form>
+</body>
+</html>

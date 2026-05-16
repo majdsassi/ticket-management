@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ticket</title>
+</head>
+<body>
+<h1 th:text="${ticket.title}"></h1>
+<p th:text="${ticket.description}"></p>
+<p>Project: <a th:href="@{'/projects/' + ${ticket.project.id}}" th:text="${ticket.project.name}"></a></p>
+<p>Reporter: <span th:text="${ticket.reporter.fullName}"></span></p>
+<p>Assignee: <span th:text="${ticket.assignee != null} ? ${ticket.assignee.fullName} : 'Unassigned'"></span></p>
+<a href="/tickets">Back to tickets</a>
+</body>
+</html>
