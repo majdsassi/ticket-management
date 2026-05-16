@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.project.model.AppUser;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardController {
@@ -44,12 +46,29 @@ public class DashboardController {
     }
 
     private String adminDashboard(Model model) {
-        model.addAttribute("totalUsers", userService.getAllUsers().size());
+        List<AppUser> allUsers = userService.getAllUsers();
+        var allTickets = ticketService.getAllTickets();
+
+        long customerCount = allUsers.stream().filter(u -> u.getRole() == UserRole.CUSTOMER).count();
+        long supportCount = allUsers.stream().filter(u -> u.getRole() == UserRole.CUSTOMER_SUPPORT).count();
+        long adminCount = allUsers.stream().filter(u -> u.getRole() == UserRole.ADMIN).count();
+
+        long openTicketCount = allTickets.stream().filter(t -> t.getStatus().name().equals("OPEN")).count();
+        long inProgressTicketCount = allTickets.stream().filter(t -> t.getStatus().name().equals("IN_PROGRESS")).count();
+        long resolvedTicketCount = allTickets.stream().filter(t -> t.getStatus().name().equals("RESOLVED")).count();
+
+        model.addAttribute("totalUsers", allUsers.size());
         model.addAttribute("totalProjects", projectService.getProjectCount());
         model.addAttribute("openTickets", ticketService.getOpenTicketsCount());
-        model.addAttribute("allTickets", ticketService.getAllTickets());
+        model.addAttribute("allTickets", allTickets);
         model.addAttribute("projects", projectService.getAllProjects());
-        model.addAttribute("allUsers", userService.getAllUsers());
+        model.addAttribute("allUsers", allUsers);
+        model.addAttribute("customerCount", customerCount);
+        model.addAttribute("supportCount", supportCount);
+        model.addAttribute("adminCount", adminCount);
+        model.addAttribute("openTicketCount", openTicketCount);
+        model.addAttribute("inProgressTicketCount", inProgressTicketCount);
+        model.addAttribute("resolvedTicketCount", resolvedTicketCount);
         return "dashboard/admin-dashboard";
     }
 
@@ -62,7 +81,13 @@ public class DashboardController {
     }
 
     private String customerDashboard(Model model, AppUser currentUser) {
-        model.addAttribute("myTickets", ticketService.getReportedTickets(currentUser));
+        var myTickets = ticketService.getReportedTickets(currentUser);
+        long myOpenTickets = myTickets.stream().filter(t -> t.getStatus().name().equals("OPEN")).count();
+        long myResolvedTickets = myTickets.stream().filter(t -> t.getStatus().name().equals("RESOLVED")).count();
+
+        model.addAttribute("myTickets", myTickets);
+        model.addAttribute("myOpenTickets", myOpenTickets);
+        model.addAttribute("myResolvedTickets", myResolvedTickets);
         model.addAttribute("projects", projectService.getAllProjects());
         return "dashboard/customer-dashboard";
     }

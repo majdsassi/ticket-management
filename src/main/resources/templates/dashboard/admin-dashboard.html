@@ -110,15 +110,15 @@
                 <div class="grid grid-cols-3 gap-6">
                     <div class="p-6 bg-blue-50 rounded-lg">
                         <p class="text-slate-600 text-sm mb-2">Customers</p>
-                        <p class="text-3xl font-bold text-blue-600" th:text="${allUsers.stream().filter(u -> u.role.name() == 'CUSTOMER').count()}">0</p>
+                        <p class="text-3xl font-bold text-blue-600" th:text="${customerCount}">0</p>
                     </div>
                     <div class="p-6 bg-purple-50 rounded-lg">
                         <p class="text-slate-600 text-sm mb-2">Support Agents</p>
-                        <p class="text-3xl font-bold text-purple-600" th:text="${allUsers.stream().filter(u -> u.role.name() == 'CUSTOMER_SUPPORT').count()}">0</p>
+                        <p class="text-3xl font-bold text-purple-600" th:text="${supportCount}">0</p>
                     </div>
                     <div class="p-6 bg-amber-50 rounded-lg">
                         <p class="text-slate-600 text-sm mb-2">Admins</p>
-                        <p class="text-3xl font-bold text-amber-600" th:text="${allUsers.stream().filter(u -> u.role.name() == 'ADMIN').count()}">0</p>
+                        <p class="text-3xl font-bold text-amber-600" th:text="${adminCount}">0</p>
                     </div>
                 </div>
             </div>
@@ -193,15 +193,15 @@
                     </div>
                     <div class="p-6 border border-slate-200 rounded-lg">
                         <p class="text-slate-600 text-sm mb-2">Open</p>
-                        <p class="text-2xl font-bold text-blue-600" th:text="${allTickets.stream().filter(t -> t.status.name() == 'OPEN').count()}">0</p>
+                        <p class="text-2xl font-bold text-blue-600" th:text="${openTicketCount}">0</p>
                     </div>
                     <div class="p-6 border border-slate-200 rounded-lg">
                             <p class="text-slate-600 text-sm mb-2">In Progress</p>
-                            <p class="text-2xl font-bold text-yellow-600" th:text="${allTickets.stream().filter(t -> t.status.name() == 'IN_PROGRESS').count()}">0</p>
+                            <p class="text-2xl font-bold text-yellow-600" th:text="${inProgressTicketCount}">0</p>
                     </div>
                     <div class="p-6 border border-slate-200 rounded-lg">
                         <p class="text-slate-600 text-sm mb-2">Resolved</p>
-                        <p class="text-2xl font-bold text-green-600" th:text="${allTickets.stream().filter(t -> t.status.name() == 'RESOLVED').count()}">0</p>
+                        <p class="text-2xl font-bold text-green-600" th:text="${resolvedTicketCount}">0</p>
                     </div>
                 </div>
             </div>

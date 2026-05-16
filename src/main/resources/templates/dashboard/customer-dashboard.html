@@ -74,7 +74,7 @@
                         <div>
                             <p class="text-slate-600 text-sm font-medium">Open Tickets</p>
                             <p class="text-4xl font-bold text-blue-600" 
-                               th:text="${myTickets.stream().filter(t -> t.status.name() == 'OPEN').count()}">0</p>
+                               th:text="${myOpenTickets}">0</p>
                         </div>
                         <span class="text-5xl">📂</span>
                     </div>
@@ -85,7 +85,7 @@
                         <div>
                             <p class="text-slate-600 text-sm font-medium">Resolved</p>
                             <p class="text-4xl font-bold text-green-600"
-                               th:text="${myTickets.stream().filter(t -> t.status.name() == 'RESOLVED').count()}">0</p>
+                               th:text="${myResolvedTickets}">0</p>
                         </div>
                         <span class="text-5xl">✓</span>
                     </div>
@@ -117,7 +117,7 @@
                                 <td class="py-3 px-4 font-medium" th:text="${ticket.title}"></td>
                                 <td class="py-3 px-4">
                                     <span th:if="${ticket.status.name() == 'OPEN'}" class="badge-open">Open</span>
-                                    <span th:if="${ticket.status.name() == 'ASSIGNED'}" class="badge-assigned">Assigned</span>
+                                    <span th:if="${ticket.status.name() == 'IN_PROGRESS'}" class="badge-assigned">In Progress</span>
                                     <span th:if="${ticket.status.name() == 'RESOLVED'}" class="badge-resolved">Resolved</span>
                                 </td>
                                 <td class="py-3 px-4">
