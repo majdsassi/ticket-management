@@ -1,211 +1,221 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Ticket System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Analytics & Performance - SupportHub</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body { @apply bg-slate-50 text-slate-900; }
-        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
-        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
-        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .chart-grid { background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 24px 24px; }
+        .glow { box-shadow: 0 20px 45px -30px rgba(0, 88, 190, 0.45); }
     </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                surface: '#f7f9fb',
+                'surface-container-lowest': '#ffffff',
+                'surface-container-low': '#f2f4f6',
+                primary: '#091426',
+                secondary: '#0058be',
+                'primary-container': '#13223f',
+                'secondary-container': '#2170e4',
+                'on-surface': '#191c1e',
+                'on-surface-variant': '#45474c',
+                outline: '#75777d',
+                'outline-variant': '#c5c6cd',
+                error: '#ba1a1a',
+                'error-container': '#ffdad6',
+                'on-error-container': '#410002'
+            }}}}
+        }
+    </script>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
-                <div class="flex items-center space-x-4">
-                    <span th:text="'Admin: ' + ${#authentication.principal.fullName}" class="text-sm"></span>
-                    <form action="/logout" method="post" style="display: inline;">
-                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100 transition">Logout</button>
-                    </form>
+<body class="bg-surface text-on-surface">
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary text-white flex flex-col p-4 z-50">
+    <div class="mb-8">
+        <h1 class="text-xl font-semibold">SupportHub</h1>
+        <p class="text-xs text-white/70">Senior Agent</p>
+    </div>
+    <nav class="flex-1 space-y-2 text-sm">
+        <a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-primary-container rounded-lg" href="/dashboard">
+            <span class="material-symbols-outlined">dashboard</span>Dashboard
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-primary-container rounded-lg" href="/tickets">
+            <span class="material-symbols-outlined">confirmation_number</span>Ticket Queue
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-white rounded-lg" href="/dashboard">
+            <span class="material-symbols-outlined">assessment</span>Reports
+        </a>
+    </nav>
+    <a href="/tickets/new" class="w-full bg-secondary text-white py-2 rounded-lg text-sm text-center">New Ticket</a>
+    <div class="mt-6 border-t border-white/10 pt-4 text-sm text-white/70">
+        <a class="flex items-center gap-3 px-3 py-2 hover:text-white" href="/logout">Sign out</a>
+    </div>
+</aside>
+
+<header class="flex justify-between items-center h-16 px-6 ml-64 bg-surface sticky top-0 border-b border-outline-variant z-40">
+    <div class="relative w-full max-w-md">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+        <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 text-sm" placeholder="Search analytics or agents..." type="text">
+    </div>
+    <div class="flex items-center gap-3">
+        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">notifications</span></button>
+        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">history</span></button>
+        <div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full text-sm">
+            <span class="material-symbols-outlined text-base">account_circle</span>
+            <span th:text="${#authentication.principal.fullName}">Admin</span>
+        </div>
+    </div>
+</header>
+
+<main class="ml-64 p-6 min-h-[calc(100vh-64px)]">
+    <section class="relative overflow-hidden rounded-2xl bg-primary text-white p-6 glow">
+        <div class="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-secondary/30 blur-2xl"></div>
+        <div class="absolute right-8 bottom-4 h-24 w-24 rounded-full bg-white/10"></div>
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+                <h2 class="text-2xl font-semibold">Analytics & Performance</h2>
+                <p class="text-sm text-white/70">Track operational health, queue pressure, and team output.</p>
+            </div>
+            <div class="flex gap-2">
+                <div class="bg-white/10 border border-white/20 px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">calendar_today</span>Oct 1 - Oct 31, 2023
                 </div>
+                <button class="bg-white text-primary px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">download</span>Export PDF
+                </button>
             </div>
         </div>
-    </nav>
+    </section>
 
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md min-h-screen">
-            <div class="p-6">
-                <nav class="space-y-2">
-                    <a href="/dashboard" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
-                        📊 Dashboard
-                    </a>
-                    <a href="/tickets" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        🎫 All Tickets
-                    </a>
-                    <hr class="my-4">
-                    <h3 class="text-sm font-bold text-slate-600 mb-3">Admin Tools</h3>
-                    <a href="#users" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        👥 Manage Users
-                    </a>
-                    <a href="#projects" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        📁 Manage Projects
-                    </a>
-                    <a href="#statistics" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        📈 Statistics
-                    </a>
-                </nav>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="mb-8">
-                <h1 class="text-4xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
-                <p class="text-slate-600">System overview and management tools</p>
-            </div>
-
-            <!-- Key Metrics -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">Total Users</p>
-                            <p class="text-3xl font-bold text-navy" th:text="${totalUsers}">0</p>
-                        </div>
-                        <span class="text-4xl">👥</span>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">Projects</p>
-                            <p class="text-3xl font-bold text-blue-600" th:text="${totalProjects}">0</p>
-                        </div>
-                        <span class="text-4xl">📁</span>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">Open Tickets</p>
-                            <p class="text-3xl font-bold text-red-600" th:text="${openTickets}">0</p>
-                        </div>
-                        <span class="text-4xl">🔴</span>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">System Health</p>
-                            <p class="text-3xl font-bold text-green-600">98%</p>
-                        </div>
-                        <span class="text-4xl">💚</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- User Statistics -->
-            <div class="card mb-8">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">User Distribution by Role</h2>
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="p-6 bg-blue-50 rounded-lg">
-                        <p class="text-slate-600 text-sm mb-2">Customers</p>
-                        <p class="text-3xl font-bold text-blue-600" th:text="${customerCount}">0</p>
-                    </div>
-                    <div class="p-6 bg-purple-50 rounded-lg">
-                        <p class="text-slate-600 text-sm mb-2">Support Agents</p>
-                        <p class="text-3xl font-bold text-purple-600" th:text="${supportCount}">0</p>
-                    </div>
-                    <div class="p-6 bg-amber-50 rounded-lg">
-                        <p class="text-slate-600 text-sm mb-2">Admins</p>
-                        <p class="text-3xl font-bold text-amber-600" th:text="${adminCount}">0</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- All Users -->
-            <div id="users" class="card mb-8">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">All Users</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-slate-200">
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Name</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Email</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Role</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Status</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Joined</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="user : ${allUsers}" class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="py-3 px-4 font-medium" th:text="${user.fullName}"></td>
-                                <td class="py-3 px-4 text-slate-600" th:text="${user.email}"></td>
-                                <td class="py-3 px-4">
-                                    <span th:if="${user.role.name() == 'ADMIN'}" class="inline-block bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-xs font-medium">Admin</span>
-                                    <span th:if="${user.role.name() == 'CUSTOMER_SUPPORT'}" class="inline-block bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium">Support</span>
-                                    <span th:if="${user.role.name() == 'CUSTOMER'}" class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">Customer</span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <span th:if="${user.active}" class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium">Active</span>
-                                    <span th:unless="${user.active}" class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-medium">Inactive</span>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600 text-xs" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Projects -->
-            <div id="projects" class="card mb-8">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">Manage Projects</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-slate-200">
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Project Name</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Description</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Tickets</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="project : ${projects}" class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="py-3 px-4 font-medium" th:text="${project.name}"></td>
-                                <td class="py-3 px-4 text-slate-600" th:text="${project.description}"></td>
-                                <td class="py-3 px-4 text-slate-600" th:text="${project.tickets.size()}"></td>
-                            </tr>
-                            <tr th:if="${projects.isEmpty()}">
-                                <td colspan="3" class="py-8 px-4 text-center text-slate-600">No projects yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Ticket Statistics -->
-            <div id="statistics" class="card">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">Ticket Statistics</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="p-6 border border-slate-200 rounded-lg">
-                        <p class="text-slate-600 text-sm mb-2">Total Tickets</p>
-                        <p class="text-2xl font-bold" th:text="${allTickets.size()}">0</p>
-                    </div>
-                    <div class="p-6 border border-slate-200 rounded-lg">
-                        <p class="text-slate-600 text-sm mb-2">Open</p>
-                        <p class="text-2xl font-bold text-blue-600" th:text="${openTicketCount}">0</p>
-                    </div>
-                    <div class="p-6 border border-slate-200 rounded-lg">
-                            <p class="text-slate-600 text-sm mb-2">In Progress</p>
-                            <p class="text-2xl font-bold text-yellow-600" th:text="${inProgressTicketCount}">0</p>
-                    </div>
-                    <div class="p-6 border border-slate-200 rounded-lg">
-                        <p class="text-slate-600 text-sm mb-2">Resolved</p>
-                        <p class="text-2xl font-bold text-green-600" th:text="${resolvedTicketCount}">0</p>
-                    </div>
-                </div>
-            </div>
-        </main>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 my-6">
+        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+            <p class="text-xs text-on-surface-variant">Total Users</p>
+            <h3 class="text-3xl font-semibold" th:text="${totalUsers}">0</h3>
+            <p class="text-xs text-on-surface-variant mt-1" th:text="${adminCount} + ' admins, ' + ${supportCount} + ' support'">0 admins, 0 support</p>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+            <p class="text-xs text-on-surface-variant">Projects</p>
+            <h3 class="text-3xl font-semibold" th:text="${totalProjects}">0</h3>
+            <p class="text-xs text-on-surface-variant mt-1">Active workspaces</p>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+            <p class="text-xs text-on-surface-variant">Open Tickets</p>
+            <h3 class="text-3xl font-semibold" th:text="${openTicketCount}">0</h3>
+            <p class="text-xs text-on-surface-variant mt-1">Needs attention</p>
+        </div>
+        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+            <p class="text-xs text-on-surface-variant">Resolved</p>
+            <h3 class="text-3xl font-semibold" th:text="${resolvedTicketCount}">0</h3>
+            <p class="text-xs text-on-surface-variant mt-1">Closed this month</p>
+        </div>
     </div>
+
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant chart-grid">
+            <h3 class="text-sm font-semibold mb-4">Ticket Volume Over Time</h3>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-white/70 border border-outline-variant rounded-lg p-4">
+                    <p class="text-xs text-on-surface-variant">Open</p>
+                    <p class="text-2xl font-semibold" th:text="${openTicketCount}">0</p>
+                </div>
+                <div class="bg-white/70 border border-outline-variant rounded-lg p-4">
+                    <p class="text-xs text-on-surface-variant">In Progress</p>
+                    <p class="text-2xl font-semibold" th:text="${inProgressTicketCount}">0</p>
+                </div>
+                <div class="bg-white/70 border border-outline-variant rounded-lg p-4">
+                    <p class="text-xs text-on-surface-variant">Resolved</p>
+                    <p class="text-2xl font-semibold" th:text="${resolvedTicketCount}">0</p>
+                </div>
+            </div>
+            <div class="h-28"></div>
+        </div>
+        <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
+            <h3 class="text-sm font-semibold mb-4">User Distribution</h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between text-sm">
+                    <span>Customers</span>
+                    <span class="font-semibold" th:text="${customerCount}">0</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span>Support</span>
+                    <span class="font-semibold" th:text="${supportCount}">0</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span>Admins</span>
+                    <span class="font-semibold" th:text="${adminCount}">0</span>
+                </div>
+                <div class="mt-4 text-xs text-on-surface-variant">Roles reflect active accounts.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b border-outline-variant">
+                <h3 class="text-sm font-semibold">Latest Tickets</h3>
+                <a class="text-sm text-secondary" href="/tickets">View queue</a>
+            </div>
+            <div class="divide-y divide-outline-variant">
+                <div class="p-4" th:each="ticket, iter : ${allTickets}" th:if="${iter.index < 6}">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-semibold" th:text="${ticket.title}">Ticket title</p>
+                            <p class="text-xs text-on-surface-variant" th:text="'TK-' + ${ticket.id} + ' • ' + ${ticket.reporter.fullName}">Ticket meta</p>
+                        </div>
+                        <div class="text-xs text-on-surface-variant" th:text="${ticket.status.name()}">OPEN</div>
+                    </div>
+                </div>
+                <div class="p-6 text-sm text-on-surface-variant" th:if="${allTickets.isEmpty()}">No tickets created yet.</div>
+            </div>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b border-outline-variant">
+                <h3 class="text-sm font-semibold">New Users</h3>
+                <a class="text-sm text-secondary" href="/users">Manage users</a>
+            </div>
+            <div class="divide-y divide-outline-variant">
+                <div class="p-4 flex items-center justify-between" th:each="user, iter : ${allUsers}" th:if="${iter.index < 6}">
+                    <div>
+                        <p class="text-sm font-semibold" th:text="${user.fullName}">User Name</p>
+                        <p class="text-xs text-on-surface-variant" th:text="${user.email}">user@email.com</p>
+                    </div>
+                    <span class="text-xs" th:text="${user.role.name()}">CUSTOMER</span>
+                </div>
+                <div class="p-6 text-sm text-on-surface-variant" th:if="${allUsers.isEmpty()}">No users found.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl mt-6 overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-outline-variant">
+            <h3 class="text-sm font-semibold">Projects Overview</h3>
+            <a class="text-sm text-secondary" href="/projects">View projects</a>
+        </div>
+        <table class="w-full text-sm">
+            <thead class="bg-surface-container-low">
+                <tr class="text-left">
+                    <th class="p-3">Project</th>
+                    <th class="p-3">Description</th>
+                    <th class="p-3">Tickets</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-t border-outline-variant" th:each="project, iter : ${projects}" th:if="${iter.index < 6}">
+                    <td class="p-3" th:text="${project.name}">Project</td>
+                    <td class="p-3 text-on-surface-variant" th:text="${project.description}">Desc</td>
+                    <td class="p-3" th:text="${project.tickets.size()}">0</td>
+                </tr>
+                <tr th:if="${projects.isEmpty()}">
+                    <td colspan="3" class="p-6 text-center text-on-surface-variant">No projects created.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
 </body>
 </html>

@@ -22,6 +22,11 @@ public class AuthController {
         return "auth/login";
     }
 
+    @GetMapping("/logout")
+    public String logoutPage() {
+        return "auth/logout";
+    }
+
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("roles", UserRole.values());

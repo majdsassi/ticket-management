@@ -1,197 +1,136 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Ticket #' + ${ticket.id}">Ticket</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title th:text="'Ticket #' + ${ticket.id} + ' - SupportHub'">Ticket Detail</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body { @apply bg-slate-50 text-slate-900; }
-        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
-        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
-        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
-        .input-field { @apply w-full px-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500; }
-        .badge { @apply inline-block px-3 py-1 rounded-full text-sm font-medium; }
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                surface: '#f7f9fb',
+                'surface-container-lowest': '#ffffff',
+                'surface-container-low': '#f2f4f6',
+                primary: '#091426',
+                secondary: '#0058be',
+                'on-surface': '#191c1e',
+                'on-surface-variant': '#45474c',
+                outline: '#75777d',
+                'outline-variant': '#c5c6cd',
+                error: '#ba1a1a',
+                'error-container': '#ffdad6'
+            }}}}
+        }
+    </script>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
-                <div class="flex items-center space-x-4">
-                    <span th:text="${#authentication.principal.fullName}" class="text-sm"></span>
-                    <form action="/logout" method="post" style="display: inline;">
-                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100">Logout</button>
-                    </form>
+<body class="bg-surface text-on-surface">
+<aside class="bg-primary text-white h-screen w-64 fixed left-0 top-0 flex flex-col p-4 z-50">
+    <div class="mb-8">
+        <h1 class="text-xl font-semibold">SupportHub</h1>
+        <p class="text-xs text-white/70">Senior Agent</p>
+    </div>
+    <nav class="flex-1 space-y-2 text-sm">
+        <a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-primary-container rounded-lg" href="/dashboard">
+            <span class="material-symbols-outlined">dashboard</span>Dashboard
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-white rounded-lg" href="/tickets">
+            <span class="material-symbols-outlined">confirmation_number</span>Ticket Queue
+        </a>
+    </nav>
+    <a href="/tickets/new" class="w-full bg-secondary text-white py-2 rounded-lg text-sm text-center">New Ticket</a>
+    <div class="mt-6 border-t border-white/10 pt-4 text-sm text-white/70">
+        <a class="flex items-center gap-3 px-3 py-2 hover:text-white" href="/logout">Sign out</a>
+    </div>
+</aside>
+
+<header class="flex justify-between items-center h-16 px-6 ml-64 sticky top-0 bg-surface border-b border-outline-variant z-40">
+    <div class="flex items-center gap-3 bg-surface-container-low px-3 py-2 rounded-lg w-96">
+        <span class="material-symbols-outlined text-on-surface-variant">search</span>
+        <input class="bg-transparent border-none focus:ring-0 text-sm w-full" placeholder="Search tickets, customers..." type="text">
+    </div>
+    <div class="flex items-center gap-3">
+        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">notifications</span></button>
+        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">history</span></button>
+        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">account_circle</span></button>
+    </div>
+</header>
+
+<main class="ml-64 p-6">
+    <div class="flex gap-6 max-w-[1600px] mx-auto">
+        <section class="flex-grow space-y-4">
+            <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs text-on-surface-variant" th:text="'TICKET #' + ${ticket.id}"></span>
+                        <span class="px-2 py-0.5 bg-error-container text-on-error-container rounded text-xs" th:if="${ticket.priority.name() == 'URGENT'}">Urgent</span>
+                    </div>
+                    <h2 class="text-lg font-semibold text-primary" th:text="${ticket.title}"></h2>
+                </div>
+                <div class="flex gap-2">
+                    <a class="px-4 py-2 border border-outline-variant rounded-lg text-xs" href="/tickets">Back to queue</a>
+                    <a class="px-4 py-2 bg-primary text-white rounded-lg text-xs" th:href="@{/tickets/{id}(id=${ticket.id})}">Actions</a>
                 </div>
             </div>
-        </div>
-    </nav>
 
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md min-h-screen">
-            <div class="p-6">
-                <nav class="space-y-2">
-                    <a href="/dashboard" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        📊 Dashboard
-                    </a>
-                    <a href="/tickets" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
-                        🎫 Tickets
-                    </a>
-                    <a href="/tickets/new" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        ➕ New Ticket
-                    </a>
-                </nav>
+            <div class="space-y-4">
+                <div class="flex gap-3">
+                    <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-xs font-semibold">CU</div>
+                    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex-grow">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold" th:text="${ticket.reporter.fullName}"></span>
+                            <span class="text-xs text-on-surface-variant" th:text="${#temporals.format(ticket.createdAt, 'MMM dd, HH:mm')}"></span>
+                        </div>
+                        <p class="text-sm text-on-surface" th:text="${ticket.description}"></p>
+                    </div>
+                </div>
+
+                <div class="space-y-3" th:if="${!ticket.comments.isEmpty()}">
+                    <div class="flex gap-3" th:each="comment : ${ticket.comments}">
+                        <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-xs font-semibold">AG</div>
+                        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex-grow">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-semibold" th:text="${comment.author.fullName}"></span>
+                                <span class="text-xs text-on-surface-variant" th:text="${#temporals.format(comment.createdAt, 'MMM dd, HH:mm')}"></span>
+                            </div>
+                            <p class="text-sm text-on-surface" th:text="${comment.message}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="w-80 space-y-4">
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
+                <h3 class="text-xs font-semibold uppercase text-on-surface-variant mb-3">Ticket Properties</h3>
+                <div class="grid gap-3 text-sm">
+                    <div>
+                        <p class="text-xs text-on-surface-variant">Status</p>
+                        <p class="font-semibold" th:text="${ticket.status.name()}"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-on-surface-variant">Priority</p>
+                        <p class="font-semibold" th:text="${ticket.priority.name()}"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-on-surface-variant">Assignee</p>
+                        <p class="font-semibold" th:text="${ticket.assignee != null ? ticket.assignee.fullName : 'Unassigned'}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
+                <h3 class="text-xs font-semibold uppercase text-on-surface-variant mb-3">Customer</h3>
+                <p class="text-sm font-semibold" th:text="${ticket.reporter.fullName}"></p>
+                <p class="text-xs text-on-surface-variant" th:text="${ticket.reporter.email}"></p>
             </div>
         </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h1 class="text-4xl font-bold text-slate-900" th:text="'Ticket #' + ${ticket.id}"></h1>
-                    <a href="/tickets" class="text-blue-600 hover:text-blue-800 font-medium">← Back to Tickets</a>
-                </div>
-                <p class="text-slate-600" th:text="${#temporals.format(ticket.createdAt, 'MMMM dd, yyyy HH:mm')}"></p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Main Content -->
-                <div class="lg:col-span-2">
-                    <!-- Ticket Title & Description -->
-                    <div class="card mb-8">
-                        <h2 class="text-2xl font-bold text-slate-900 mb-4" th:text="${ticket.title}"></h2>
-                        <div class="prose prose-sm max-w-none">
-                            <p class="text-slate-700 whitespace-pre-wrap" th:text="${ticket.description}"></p>
-                        </div>
-                    </div>
-
-                    <!-- Edit Form (if user can edit) -->
-                    <div th:if="${canEdit}" class="card">
-                        <h3 class="text-lg font-bold text-slate-900 mb-6">Edit Ticket</h3>
-                        <form method="post" th:action="@{/tickets/{id}/update(id=${ticket.id})}" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Title</label>
-                                <input type="text" name="title" th:value="${ticket.title}" required class="input-field">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                                <textarea name="description" rows="4" class="input-field" th:text="${ticket.description}"></textarea>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
-                                    <select name="status" required class="input-field">
-                                        <option th:each="status : ${statuses}" 
-                                                th:value="${status.name()}" 
-                                                th:text="${status.name()}"
-                                                th:selected="${ticket.status.name() == status.name()}"></option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Priority</label>
-                                    <select name="priority" required class="input-field">
-                                        <option th:each="priority : ${priorities}" 
-                                                th:value="${priority.name()}" 
-                                                th:text="${priority.name()}"
-                                                th:selected="${ticket.priority.name() == priority.name()}"></option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div sec:authorize="hasAnyRole('ADMIN','CUSTOMER_SUPPORT')">
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Assign To</label>
-                                <select name="assigneeId" class="input-field">
-                                    <option value="">-- Unassigned --</option>
-                                    <option th:each="user : ${users}" 
-                                            th:value="${user.id}" 
-                                            th:text="${user.fullName}"
-                                            th:selected="${ticket.assignee != null && ticket.assignee.id == user.id}"></option>
-                                </select>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button type="submit" class="btn-primary">Save Changes</button>
-                                <form method="post" th:action="@{/tickets/{id}/delete(id=${ticket.id})}" style="display: inline;">
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium transition-colors" onclick="return confirm('Are you sure?')">Delete Ticket</button>
-                                </form>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Sidebar Info -->
-                <div class="lg:col-span-1">
-                    <!-- Status Card -->
-                    <div class="card mb-6">
-                        <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Status</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-xs text-slate-600 mb-2">Current Status</p>
-                                <div class="badge" th:if="${ticket.status.name() == 'OPEN'}" style="background: rgb(219 234 254); color: rgb(30 58 138);">Open</div>
-                                    <div class="badge" th:if="${ticket.status.name() == 'IN_PROGRESS'}" style="background: rgb(254 243 192); color: rgb(113 63 18);">In Progress</div>
-                                <div class="badge" th:if="${ticket.status.name() == 'RESOLVED'}" style="background: rgb(220 252 231); color: rgb(5 46 22);">Resolved</div>
-                                <div class="badge" th:if="${ticket.status.name() == 'CLOSED'}" style="background: rgb(241 245 249); color: rgb(51 65 85);">Closed</div>
-                            </div>
-
-                            <div>
-                                <p class="text-xs text-slate-600 mb-2">Priority</p>
-                                <div class="badge" th:if="${ticket.priority.name() == 'URGENT'}" style="background: rgb(254 226 226); color: rgb(127 29 29);">🔴 Urgent</div>
-                                <div class="badge" th:if="${ticket.priority.name() == 'HIGH'}" style="background: rgb(254 237 210); color: rgb(92 51 23);">🟠 High</div>
-                                <div class="badge" th:if="${ticket.priority.name() == 'MEDIUM'}" style="background: rgb(254 243 192); color: rgb(113 63 18);">🟡 Medium</div>
-                                <div class="badge" th:if="${ticket.priority.name() == 'LOW'}" style="background: rgb(220 252 231); color: rgb(5 46 22);">🟢 Low</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Details Card -->
-                    <div class="card mb-6">
-                        <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Details</h3>
-                        <dl class="space-y-4 text-sm">
-                            <div>
-                                <dt class="text-xs text-slate-600 font-medium">Project</dt>
-                                <dd class="text-slate-900 font-medium" th:text="${ticket.project.name}"></dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-600 font-medium">Reporter</dt>
-                                <dd class="text-slate-900 font-medium" th:text="${ticket.reporter.fullName}"></dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-600 font-medium">Assignee</dt>
-                                <dd class="text-slate-900 font-medium" th:text="${ticket.assignee != null ? ticket.assignee.fullName : 'Unassigned'}"></dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-600 font-medium">Created</dt>
-                                <dd class="text-slate-900 font-medium" th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy')}"></dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs text-slate-600 font-medium">Updated</dt>
-                                <dd class="text-slate-900 font-medium" th:text="${#temporals.format(ticket.updatedAt, 'MMM dd, yyyy')}"></dd>
-                            </div>
-                        </dl>
-                    </div>
-
-                    <!-- Comments Card -->
-                    <div class="card">
-                        <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Comments</h3>
-                        <div class="space-y-4 text-sm">
-                            <p th:if="${ticket.comments.isEmpty()}" class="text-slate-600 italic">No comments yet.</p>
-                            <div th:each="comment : ${ticket.comments}" class="border-t border-slate-200 pt-4">
-                                <p class="font-medium text-slate-900" th:text="${comment.author.fullName}"></p>
-                                <p class="text-xs text-slate-600 mb-2" th:text="${#temporals.format(comment.createdAt, 'MMM dd, yyyy HH:mm')}"></p>
-                                <p class="text-slate-700" th:text="${comment.message}"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
     </div>
+</main>
 </body>
 </html>

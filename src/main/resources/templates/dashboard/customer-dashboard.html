@@ -1,158 +1,122 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Ticket System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Customer Portal - SupportHub</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body { @apply bg-slate-50 text-slate-900; }
-        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
-        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
-        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
-        .badge-open { @apply inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium; }
-        .badge-assigned { @apply inline-block bg-yellow-50 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium; }
-        .badge-resolved { @apply inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium; }
-        .badge-urgent { @apply inline-block bg-red-50 text-red-700 px-3 py-1 rounded-full text-sm font-medium; }
+        body { background-color: #f7f9fb; font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                surface: '#f7f9fb',
+                'surface-container-lowest': '#ffffff',
+                'surface-container-low': '#f2f4f6',
+                primary: '#091426',
+                secondary: '#0058be',
+                'on-surface': '#191c1e',
+                'on-surface-variant': '#45474c',
+                outline: '#75777d',
+                'outline-variant': '#c5c6cd'
+            }}}}
+        }
+    </script>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
-                <div class="flex items-center space-x-4">
-                    <span th:text="'Welcome, ' + ${#authentication.principal.fullName}" class="text-sm"></span>
-                    <form action="/logout" method="post" style="display: inline;">
-                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100 transition">Logout</button>
-                    </form>
+<body class="bg-surface text-on-surface">
+<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant flex justify-between items-center h-16 px-6">
+    <div class="flex items-center gap-3">
+        <span class="text-xl font-semibold text-primary">SupportHub</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 text-sm">
+        <a class="text-secondary font-semibold border-b-2 border-secondary" href="/dashboard">Knowledge Base</a>
+        <a class="text-on-surface-variant hover:text-primary" href="/tickets">My Tickets</a>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="/tickets/new" class="bg-primary text-white px-4 py-2 rounded-lg text-sm">Submit a Ticket</a>
+        <a href="/logout" class="text-on-surface-variant text-sm">Sign out</a>
+    </div>
+</header>
+
+<main>
+    <section class="relative bg-primary py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl font-semibold text-white mb-2">How can we help?</h1>
+            <p class="text-sm text-white/70 mb-6">Search our knowledge base for articles and troubleshooting tips.</p>
+            <div class="relative max-w-2xl mx-auto">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <input class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border-none shadow-sm" placeholder="Search for articles, keywords, or topics..." type="text">
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
+                <p class="text-xs text-on-surface-variant">Total Tickets</p>
+                <p class="text-2xl font-semibold" th:text="${myTickets.size()}">0</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
+                <p class="text-xs text-on-surface-variant">Open Tickets</p>
+                <p class="text-2xl font-semibold" th:text="${myOpenTickets}">0</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
+                <p class="text-xs text-on-surface-variant">Resolved</p>
+                <p class="text-2xl font-semibold" th:text="${myResolvedTickets}">0</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
+                <p class="text-xs text-on-surface-variant">Active Projects</p>
+                <p class="text-2xl font-semibold" th:text="${projects.size()}">0</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-white border border-outline-variant rounded-xl overflow-hidden">
+                <div class="flex items-center justify-between p-4 border-b border-outline-variant">
+                    <h2 class="text-sm font-semibold">My Tickets</h2>
+                    <a href="/tickets/new" class="text-sm text-secondary">New Ticket</a>
+                </div>
+                <table class="w-full text-sm">
+                    <thead class="bg-surface-container-low">
+                        <tr class="text-left">
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Title</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Priority</th>
+                            <th class="p-3">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ticket, iter : ${myTickets}" th:if="${iter.index < 6}" class="border-t border-outline-variant hover:bg-surface-container-low">
+                            <td class="p-3" th:text="'#' + ${ticket.id}"></td>
+                            <td class="p-3" th:text="${ticket.title}"></td>
+                            <td class="p-3" th:text="${ticket.status.name()}"></td>
+                            <td class="p-3" th:text="${ticket.priority.name()}"></td>
+                            <td class="p-3" th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy')}"></td>
+                        </tr>
+                        <tr th:if="${myTickets.isEmpty()}">
+                            <td colspan="5" class="p-6 text-center text-on-surface-variant">No tickets yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
+                <h3 class="text-sm font-semibold mb-4">Featured Projects</h3>
+                <div class="space-y-3 text-sm">
+                    <div th:each="project, iter : ${projects}" th:if="${iter.index < 5}">
+                        <p class="font-semibold" th:text="${project.name}">Project</p>
+                        <p class="text-xs text-on-surface-variant" th:text="${project.description}">Description</p>
+                    </div>
+                    <p class="text-on-surface-variant" th:if="${projects.isEmpty()}">No projects available.</p>
                 </div>
             </div>
         </div>
-    </nav>
-
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md min-h-screen">
-            <div class="p-6">
-                <nav class="space-y-2">
-                    <a href="/dashboard" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
-                        📊 Dashboard
-                    </a>
-                    <a href="/tickets" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        🎫 My Tickets
-                    </a>
-                    <a href="/tickets/new" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        ➕ Open New Ticket
-                    </a>
-                </nav>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="mb-8">
-                <h1 class="text-4xl font-bold text-slate-900 mb-2">Customer Dashboard</h1>
-                <p class="text-slate-600">Manage and track your support tickets</p>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">Total Tickets</p>
-                            <p class="text-4xl font-bold text-slate-900" th:text="${myTickets.size()}">0</p>
-                        </div>
-                        <span class="text-5xl">🎫</span>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">Open Tickets</p>
-                            <p class="text-4xl font-bold text-blue-600" 
-                               th:text="${myOpenTickets}">0</p>
-                        </div>
-                        <span class="text-5xl">📂</span>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-600 text-sm font-medium">Resolved</p>
-                            <p class="text-4xl font-bold text-green-600"
-                               th:text="${myResolvedTickets}">0</p>
-                        </div>
-                        <span class="text-5xl">✓</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Tickets -->
-            <div class="card">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold text-slate-900">Your Tickets</h2>
-                    <a href="/tickets/new" class="btn-primary">➕ New Ticket</a>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-slate-200">
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">ID</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Title</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Status</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Priority</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Created</th>
-                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="ticket : ${myTickets}" class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="py-3 px-4 text-slate-600" th:text="'#' + ${ticket.id}"></td>
-                                <td class="py-3 px-4 font-medium" th:text="${ticket.title}"></td>
-                                <td class="py-3 px-4">
-                                    <span th:if="${ticket.status.name() == 'OPEN'}" class="badge-open">Open</span>
-                                    <span th:if="${ticket.status.name() == 'IN_PROGRESS'}" class="badge-assigned">In Progress</span>
-                                    <span th:if="${ticket.status.name() == 'RESOLVED'}" class="badge-resolved">Resolved</span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <span th:if="${ticket.priority.name() == 'URGENT'}" class="badge-urgent">Urgent</span>
-                                    <span th:if="${ticket.priority.name() == 'HIGH'}" class="inline-block bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">High</span>
-                                    <span th:if="${ticket.priority.name() == 'MEDIUM'}" class="inline-block bg-yellow-50 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">Medium</span>
-                                    <span th:if="${ticket.priority.name() == 'LOW'}" class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">Low</span>
-                                </td>
-                                <td class="py-3 px-4 text-sm text-slate-600" th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy')}"></td>
-                                <td class="py-3 px-4">
-                                    <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">View</a>
-                                </td>
-                            </tr>
-                            <tr th:if="${myTickets.isEmpty()}">
-                                <td colspan="6" class="py-8 px-4 text-center text-slate-600">
-                                    No tickets yet. <a href="/tickets/new" class="text-blue-600 hover:text-blue-800 font-medium">Create one</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Projects Section -->
-            <div class="card mt-8">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">Available Projects</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div th:each="project : ${projects}" class="border border-slate-200 rounded-lg p-6 hover:shadow-md transition">
-                        <h3 class="text-lg font-semibold text-slate-900 mb-2" th:text="${project.name}"></h3>
-                        <p class="text-slate-600 text-sm mb-4" th:text="${project.description}"></p>
-                        <a th:href="@{/tickets/new(projectId=${project.id})}" class="btn-primary text-sm">Open Ticket</a>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+    </section>
+</main>
 </body>
 </html>
