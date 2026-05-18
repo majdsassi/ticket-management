@@ -1,11 +1,124 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Project</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title th:text="${project.name} + ' · Kinetic Ops'">Project Detail · Kinetic Ops</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --surface: #f7f9fb;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f2f4f6;
+            --surface-container-high: #e6e8ea;
+            --on-surface: #191c1e;
+            --on-surface-variant: #45474c;
+            --outline: #75777d;
+            --outline-variant: #c5c6cd;
+            --primary: #091426;
+            --primary-container: #1e293b;
+            --secondary: #0058be;
+            --error: #ba1a1a;
+            --radius-default: 0.25rem;
+            --radius-lg: 0.5rem;
+        }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--surface); color: var(--on-surface); }
+        .headline-lg { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em; }
+        .headline-md { font-size: 20px; font-weight: 600; line-height: 28px; }
+        .body-md { font-size: 14px; font-weight: 400; line-height: 20px; }
+        .body-sm { font-size: 13px; font-weight: 400; line-height: 18px; }
+        .label-md { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .kinetic-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            box-shadow: 0px 4px 12px rgba(30, 41, 59, 0.05);
+        }
+        .kinetic-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-default);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .kinetic-btn-primary:hover { background-color: var(--primary-container); }
+        .kinetic-btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--outline-variant);
+            color: var(--on-surface-variant);
+            border-radius: var(--radius-default);
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .kinetic-btn-secondary:hover { border-color: var(--secondary); color: var(--secondary); }
+        .info-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+        .info-label { width: 120px; font-weight: 600; color: var(--on-surface-variant); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .info-value { flex: 1; color: var(--on-surface); font-size: 0.875rem; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24; }
+    </style>
 </head>
-<body>
-<h1 th:text="${project.name}"></h1>
-<p th:text="${project.description}"></p>
-<a href="/projects">Back to projects</a>
+<body class="bg-surface">
+
+<header class="sticky top-0 z-50 bg-surface-container-lowest/95 backdrop-blur-sm border-b border-outline-variant">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-sm">KO</div>
+            <span class="text-xl font-bold tracking-tight text-primary">Kinetic<span class="font-medium text-on-surface-variant"> Ops</span></span>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/projects" class="text-on-surface-variant text-sm hover:text-primary transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">arrow_back</span> All projects
+            </a>
+            <a th:href="@{'/projects/' + ${project.id} + '/edit'}" class="kinetic-btn-primary text-sm">
+                <span class="material-symbols-outlined text-base">edit</span> Edit
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div class="kinetic-card p-6 md:p-8">
+        <div class="mb-6">
+            <h1 class="headline-lg text-primary" th:text="${project.name}">Project Name</h1>
+            <div class="flex items-center gap-3 mt-2">
+                <span class="text-xs text-on-surface-variant">ID: #<span th:text="${project.id}">001</span></span>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="label-md text-secondary mb-3">Description</h2>
+            <p class="body-md text-on-surface leading-relaxed" th:text="${project.description != null ? project.description : 'No description provided.'}">
+                Project description goes here.
+            </p>
+        </div>
+
+        <div class="pt-4 border-t border-outline-variant">
+            <h2 class="label-md text-secondary mb-4">Project details</h2>
+            <div class="space-y-3">
+                <div class="info-row">
+                    <div class="info-label">Created</div>
+                    <div class="info-value">
+                        <span th:if="${project.createdAt != null}" th:text="${#temporals.format(project.createdAt, 'MMMM dd, yyyy · h:mm a')}">N/A</span>
+                        <span th:unless="${project.createdAt != null}">Not available</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 </body>
 </html>

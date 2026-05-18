@@ -2,104 +2,361 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Ticket - Ticket System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kinetic Ops · Create Ticket</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { @apply bg-slate-50 text-slate-900; }
-        .navbar { @apply sticky top-0 z-50 bg-gradient-to-r from-navy to-primary text-white shadow-md; }
-        .card { @apply bg-white border border-slate-200 rounded-lg shadow-sm p-6; }
-        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors; }
-        .input-field { @apply w-full px-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500; }
+        :root {
+            --surface: #f7f9fb;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f2f4f6;
+            --surface-container: #eceef0;
+            --surface-container-high: #e6e8ea;
+            --surface-container-highest: #e0e3e5;
+            --on-surface: #191c1e;
+            --on-surface-variant: #45474c;
+            --outline: #75777d;
+            --outline-variant: #c5c6cd;
+            --primary: #091426;
+            --primary-container: #1e293b;
+            --secondary: #0058be;
+            --secondary-container: #2170e4;
+            --error: #ba1a1a;
+            --error-container: #ffdad6;
+            --on-error-container: #93000a;
+            --radius-sm: 0.125rem;
+            --radius-default: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-full: 9999px;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            font-synthesis: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Typography */
+        .headline-lg { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em; }
+        .headline-md { font-size: 20px; font-weight: 600; line-height: 28px; }
+        .headline-sm { font-size: 18px; font-weight: 600; line-height: 24px; }
+        .body-md { font-size: 14px; font-weight: 400; line-height: 20px; }
+        .body-sm { font-size: 13px; font-weight: 400; line-height: 18px; }
+        .label-md { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .label-sm { font-size: 11px; font-weight: 500; line-height: 14px; }
+        
+        /* Kinetic Ops Components */
+        .kinetic-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            box-shadow: 0px 4px 12px rgba(30, 41, 59, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .kinetic-card-hover:hover {
+            border-color: #bcc7de;
+            box-shadow: 0px 6px 16px rgba(30, 41, 59, 0.08);
+        }
+        
+        .kinetic-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-default);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .kinetic-btn-primary:hover { background-color: var(--primary-container); }
+        
+        .kinetic-btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--outline-variant);
+            color: var(--on-surface-variant);
+            border-radius: var(--radius-default);
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .kinetic-btn-secondary:hover { border-color: var(--secondary); color: var(--secondary); }
+        
+        .kinetic-input, .kinetic-textarea, .kinetic-select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .kinetic-input:focus, .kinetic-textarea:focus, .kinetic-select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(0, 88, 190, 0.2);
+        }
+        
+        .kinetic-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        
+        .priority-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Alert styles */
+        .alert-error {
+            background-color: var(--error-container);
+            border-left: 4px solid var(--error);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            color: var(--on-error-container);
+        }
+        
+        /* Header */
+        .page-header {
+            background-color: var(--surface-container-lowest);
+            border-bottom: 1px solid var(--outline-variant);
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="/dashboard" class="text-2xl font-bold">🎫 Ticket System</a>
-                <div class="flex items-center space-x-4">
-                    <span th:text="${#authentication.principal.fullName}" class="text-sm"></span>
-                    <form action="/logout" method="post" style="display: inline;">
-                        <button type="submit" class="bg-white text-navy px-4 py-2 rounded-md font-medium hover:bg-slate-100">Logout</button>
-                    </form>
-                </div>
+
+<!-- Simple Header with Back Link -->
+<header class="page-header sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="/tickets" class="text-on-surface-variant hover:text-primary transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                <span class="text-sm font-medium">Back to tickets</span>
+            </a>
+            <div class="h-6 w-px bg-outline-variant"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-md bg-primary flex items-center justify-center text-white font-bold text-xs">KO</div>
+                <span class="text-sm font-semibold text-primary">Kinetic Ops</span>
             </div>
         </div>
-    </nav>
+        <div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full text-sm border border-outline-variant">
+            <span class="material-symbols-outlined text-base text-on-surface-variant">account_circle</span>
+            <span th:text="${#authentication.principal.fullName}" class="font-medium text-on-surface">User</span>
+        </div>
+    </div>
+</header>
 
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md min-h-screen">
-            <div class="p-6">
-                <nav class="space-y-2">
-                    <a href="/dashboard" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        📊 Dashboard
-                    </a>
-                    <a href="/tickets" class="block px-4 py-3 rounded-md hover:bg-slate-100 text-slate-700">
-                        🎫 Tickets
-                    </a>
-                    <a href="/tickets/new" class="block px-4 py-3 rounded-md bg-blue-50 text-blue-600 font-medium">
-                        ➕ New Ticket
-                    </a>
-                </nav>
+<!-- Main Content -->
+<main class="py-8 px-6">
+    <div class="max-w-3xl mx-auto">
+        <!-- Page Title -->
+        <div class="mb-6">
+            <h1 class="headline-lg text-primary">Create new ticket</h1>
+            <p class="body-md text-on-surface-variant mt-1">Submit a support request to our customer service team.</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div th:if="${error}" class="mb-6 alert-error flex items-start gap-3">
+            <span class="material-symbols-outlined text-error flex-shrink-0">error</span>
+            <div class="flex-1">
+                <p class="font-semibold text-sm">Error creating ticket</p>
+                <p class="text-sm" th:text="${error}"></p>
             </div>
-        </aside>
+        </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <div class="mb-8">
-                <h1 class="text-4xl font-bold text-slate-900 mb-2">Create New Ticket</h1>
-                <p class="text-slate-600">Submit a new support ticket</p>
+        <!-- Success Message (optional) -->
+        <div th:if="${success}" class="mb-6 bg-green-50 border-l-4 border-green-600 rounded-md p-4 flex items-start gap-3">
+            <span class="material-symbols-outlined text-green-600 flex-shrink-0">check_circle</span>
+            <div>
+                <p class="font-semibold text-sm text-green-800">Ticket created successfully</p>
+                <p class="text-sm text-green-700" th:text="${success}"></p>
             </div>
+        </div>
 
-            <div class="card max-w-3xl">
-                <div th:if="${error}" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
-                    ✗ <span th:text="${error}"></span>
+        <!-- Form Card -->
+        <div class="kinetic-card">
+            <form method="post" action="/tickets" id="ticketForm" class="p-6 space-y-6">
+                <!-- CSRF Token -->
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <!-- Title Field -->
+                <div>
+                    <label for="title" class="kinetic-label">
+                        Ticket title <span class="text-error">*</span>
+                    </label>
+                    <input type="text" id="title" name="title" required 
+                           class="kinetic-input"
+                           placeholder="e.g., Unable to access billing dashboard"
+                           th:value="${ticketTitle}">
+                    <p class="text-xs text-on-surface-variant mt-1">Be specific to help our team prioritize faster.</p>
                 </div>
 
-                <form method="post" action="/tickets" class="space-y-6">
+                <!-- Description Field -->
+                <div>
+                    <label for="description" class="kinetic-label">
+                        Description
+                    </label>
+                    <textarea id="description" name="description" rows="6"
+                              class="kinetic-textarea resize-y"
+                              placeholder="Provide detailed context, steps to reproduce, and any relevant error messages..."></textarea>
+                    <p class="text-xs text-on-surface-variant mt-1">Markdown syntax is supported for formatting.</p>
+                </div>
+
+                <!-- Project & Priority Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Project Selection -->
                     <div>
-                        <label for="title" class="block text-sm font-medium text-slate-700 mb-2">Ticket Title *</label>
-                        <input type="text" id="title" name="title" required 
-                               class="input-field"
-                               placeholder="Brief description of the issue">
+                        <label for="projectId" class="kinetic-label">
+                            Project <span class="text-error">*</span>
+                        </label>
+                        <select id="projectId" name="projectId" required class="kinetic-select">
+                            <option value="" disabled selected>— Select a project —</option>
+                            <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.name}"></option>
+                        </select>
+                        <p class="text-xs text-on-surface-variant mt-1">Tickets are linked to active workspaces.</p>
                     </div>
 
+                    <!-- Priority -->
                     <div>
-                        <label for="description" class="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                        <textarea id="description" name="description" rows="6"
-                                  class="input-field"
-                                  placeholder="Detailed description of your issue..."></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-6">
-                        <div>
-                            <label for="projectId" class="block text-sm font-medium text-slate-700 mb-2">Project *</label>
-                            <select id="projectId" name="projectId" required class="input-field">
-                                <option value="">-- Select Project --</option>
-                                <option th:each="p : ${projects}" th:value="${p.id}" th:text="${p.name}"></option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="priority" class="block text-sm font-medium text-slate-700 mb-2">Priority</label>
-                            <select id="priority" name="priority" class="input-field">
-                                <option value="">Select Priority</option>
-                                <option th:each="priority : ${priorities}" th:value="${priority.name()}" th:text="${priority.name()}"></option>
-                            </select>
+                        <label for="priority" class="kinetic-label">
+                            Priority level
+                        </label>
+                        <select id="priority" name="priority" class="kinetic-select">
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="LOW">Low</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <span class="priority-chip bg-green-50 text-green-700">LOW</span>
+                            <span class="priority-chip bg-blue-50 text-blue-700">MEDIUM</span>
+                            <span class="priority-chip bg-orange-50 text-orange-700">HIGH</span>
+                            <span class="priority-chip bg-error/10 text-error">URGENT</span>
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex gap-4 pt-6">
-                        <button type="submit" class="btn-primary">Create Ticket</button>
-                        <a href="/tickets" class="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded-md font-medium transition-colors">Cancel</a>
+                <!-- Additional Options (Optional) 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="assigneeId" class="kinetic-label">
+                            Assign to (optional)
+                        </label>
+                        <select id="assigneeId" name="assigneeId" class="kinetic-select">
+                            <option value="">— Unassigned —</option>
+                            <option th:each="agent : ${supportAgents}" th:value="${agent.id}" th:text="${agent.fullName}"></option>
+                        </select>
                     </div>
-                </form>
-            </div>
-        </main>
+                    
+                    <div>
+                        <label for="dueDate" class="kinetic-label">
+                            Due date (optional)
+                        </label>
+                        <input type="date" id="dueDate" name="dueDate" class="kinetic-input">
+                    </div>
+                </div>
+            -->
+                <!-- Info Box / Pro Tip -->
+                <div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant">
+                    <div class="flex gap-3">
+                        <span class="material-symbols-outlined text-secondary text-base flex-shrink-0">lightbulb</span>
+                        <div>
+                            <p class="text-sm font-semibold text-on-surface">Pro tip</p>
+                            <p class="text-sm text-on-surface-variant">Include error codes, screenshots, or logs in your description to speed up resolution. Our team typically responds within 2 hours for urgent tickets.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="kinetic-btn-primary">
+                        <span class="material-symbols-outlined text-base">send</span>
+                        Create ticket
+                    </button>
+                    <a href="/tickets" class="kinetic-btn-secondary">
+                        <span class="material-symbols-outlined text-base">close</span>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-6 text-center">
+            <p class="text-xs text-on-surface-variant">
+                Need help? 
+                <a href="/knowledge-base" class="text-secondary hover:underline">Visit our knowledge base</a>
+                or contact your system administrator.
+            </p>
+        </div>
     </div>
+</main>
+
+<!-- Form Validation JavaScript -->
+<script>
+    const form = document.getElementById('ticketForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const title = document.getElementById('title')?.value.trim();
+            const project = document.getElementById('projectId')?.value;
+            
+            if (!title) {
+                e.preventDefault();
+                alert('Please enter a ticket title.');
+                document.getElementById('title')?.focus();
+                return false;
+            }
+            
+            if (!project) {
+                e.preventDefault();
+                alert('Please select a project for this ticket.');
+                document.getElementById('projectId')?.focus();
+                return false;
+            }
+            
+            return true;
+        });
+    }
+    
+    // Priority hint on selection
+    const prioritySelect = document.getElementById('priority');
+    if (prioritySelect) {
+        prioritySelect.addEventListener('change', function() {
+            const priority = this.value;
+            if (priority === 'URGENT') {
+                console.log('Urgent priority selected - SLA: 2 hours response time');
+            }
+        });
+    }
+</script>
 </body>
-</html>
 </html>

@@ -2,220 +2,476 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics & Performance - SupportHub</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kinetic Ops · Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .chart-grid { background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 24px 24px; }
-        .glow { box-shadow: 0 20px 45px -30px rgba(0, 88, 190, 0.45); }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: { extend: { colors: {
-                surface: '#f7f9fb',
-                'surface-container-lowest': '#ffffff',
-                'surface-container-low': '#f2f4f6',
-                primary: '#091426',
-                secondary: '#0058be',
-                'primary-container': '#13223f',
-                'secondary-container': '#2170e4',
-                'on-surface': '#191c1e',
-                'on-surface-variant': '#45474c',
-                outline: '#75777d',
-                'outline-variant': '#c5c6cd',
-                error: '#ba1a1a',
-                'error-container': '#ffdad6',
-                'on-error-container': '#410002'
-            }}}}
+        :root {
+            --surface: #f7f9fb;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f2f4f6;
+            --surface-container: #eceef0;
+            --surface-container-high: #e6e8ea;
+            --surface-container-highest: #e0e3e5;
+            --on-surface: #191c1e;
+            --on-surface-variant: #45474c;
+            --outline: #75777d;
+            --outline-variant: #c5c6cd;
+            --primary: #091426;
+            --primary-container: #1e293b;
+            --secondary: #0058be;
+            --secondary-container: #2170e4;
+            --error: #ba1a1a;
+            --error-container: #ffdad6;
+            --radius-sm: 0.125rem;
+            --radius-default: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-full: 9999px;
         }
-    </script>
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            font-synthesis: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Typography */
+        .headline-lg { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em; }
+        .headline-md { font-size: 20px; font-weight: 600; line-height: 28px; }
+        .body-md { font-size: 14px; font-weight: 400; line-height: 20px; }
+        .body-sm { font-size: 13px; font-weight: 400; line-height: 18px; }
+        .label-md { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .label-sm { font-size: 11px; font-weight: 500; line-height: 14px; }
+        
+        /* Kinetic Ops Components */
+        .kinetic-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            box-shadow: 0px 4px 12px rgba(30, 41, 59, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .kinetic-card-hover:hover {
+            border-color: #bcc7de;
+            box-shadow: 0px 6px 16px rgba(30, 41, 59, 0.08);
+        }
+        
+        .kinetic-stat-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .kinetic-stat-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0px 6px 16px rgba(30, 41, 59, 0.08);
+        }
+        
+        .kinetic-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-default);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .kinetic-btn-primary:hover { background-color: var(--primary-container); }
+        
+        .kinetic-btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--outline-variant);
+            color: var(--on-surface-variant);
+            border-radius: var(--radius-default);
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .kinetic-btn-secondary:hover { border-color: var(--secondary); color: var(--secondary); }
+        
+        .kinetic-input {
+            background-color: white;
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.75rem 0.5rem 2rem;
+            font-size: 0.875rem;
+            width: 100%;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        
+        .kinetic-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(0, 88, 190, 0.2);
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Table styling */
+        .kinetic-table { width: 100%; border-collapse: collapse; }
+        .kinetic-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background-color: var(--surface-container-low);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            border-bottom: 1px solid var(--outline-variant);
+        }
+        .kinetic-table td { padding: 1rem; border-bottom: 1px solid var(--outline-variant); font-size: 0.875rem; }
+        .kinetic-table tbody tr:hover { background-color: var(--surface-container-low); }
+        
+        /* Navigation */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            color: var(--on-surface-variant);
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--surface-container-high);
+            color: var(--on-surface);
+        }
+        
+        .nav-item-active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .nav-item-active:hover {
+            background-color: var(--primary-container);
+            color: white;
+        }
+        
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24; }
+    </style>
 </head>
-<body class="bg-surface text-on-surface">
-<aside class="h-screen w-64 fixed left-0 top-0 bg-primary text-white flex flex-col p-4 z-50">
-    <div class="mb-8">
-        <h1 class="text-xl font-semibold">SupportHub</h1>
-        <p class="text-xs text-white/70">Senior Agent</p>
+<body class="bg-surface">
+
+<!-- Sidebar - Kinetic Ops Navy -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-primary text-white flex flex-col shadow-xl z-50">
+    <div class="p-6 border-b border-white/10">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center font-bold text-sm">KO</div>
+            <span class="text-xl font-bold tracking-tight">Kinetic<span class="font-medium text-white/70"> Ops</span></span>
+        </div>
+        <p class="text-xs text-white/60 mt-2">Analytics Portal</p>
     </div>
-    <nav class="flex-1 space-y-2 text-sm">
-        <a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-primary-container rounded-lg" href="/dashboard">
-            <span class="material-symbols-outlined">dashboard</span>Dashboard
+    
+    <nav class="flex-1 p-4 space-y-1">
+        <a href="/dashboard" class="nav-item nav-item-active">
+            <span class="material-symbols-outlined text-base">dashboard</span>
+            <span class="text-sm font-medium">Dashboard</span>
         </a>
-        <a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-primary-container rounded-lg" href="/tickets">
-            <span class="material-symbols-outlined">confirmation_number</span>Ticket Queue
+        <a href="/tickets" class="nav-item">
+            <span class="material-symbols-outlined text-base">confirmation_number</span>
+            <span class="text-sm font-medium">Ticket Queue</span>
         </a>
-        <a class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-white rounded-lg" href="/dashboard">
-            <span class="material-symbols-outlined">assessment</span>Reports
+        <a href="/projects" class="nav-item">
+            <span class="material-symbols-outlined text-base">folder_special</span>
+            <span class="text-sm font-medium">Projects</span>
+        </a>
+        <a href="/users" class="nav-item">
+            <span class="material-symbols-outlined text-base">people</span>
+            <span class="text-sm font-medium">Users</span>
         </a>
     </nav>
-    <a href="/tickets/new" class="w-full bg-secondary text-white py-2 rounded-lg text-sm text-center">New Ticket</a>
-    <div class="mt-6 border-t border-white/10 pt-4 text-sm text-white/70">
-        <a class="flex items-center gap-3 px-3 py-2 hover:text-white" href="/logout">Sign out</a>
+    
+    <div class="p-4 border-t border-white/10 space-y-2">
+        <a href="/tickets/new" class="kinetic-btn-primary w-full justify-center bg-white text-primary hover:bg-white/90">
+            <span class="material-symbols-outlined text-base">add_comment</span>
+            New Ticket
+        </a>
+        <a href="/logout" class="nav-item text-white/70 hover:text-white">
+            <span class="material-symbols-outlined text-base">logout</span>
+            <span class="text-sm font-medium">Sign out</span>
+        </a>
     </div>
 </aside>
 
-<header class="flex justify-between items-center h-16 px-6 ml-64 bg-surface sticky top-0 border-b border-outline-variant z-40">
-    <div class="relative w-full max-w-md">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-        <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-10 pr-4 text-sm" placeholder="Search analytics or agents..." type="text">
-    </div>
-    <div class="flex items-center gap-3">
-        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">notifications</span></button>
-        <button class="p-2 rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined">history</span></button>
-        <div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full text-sm">
-            <span class="material-symbols-outlined text-base">account_circle</span>
-            <span th:text="${#authentication.principal.fullName}">Admin</span>
-        </div>
-    </div>
-</header>
-
-<main class="ml-64 p-6 min-h-[calc(100vh-64px)]">
-    <section class="relative overflow-hidden rounded-2xl bg-primary text-white p-6 glow">
-        <div class="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-secondary/30 blur-2xl"></div>
-        <div class="absolute right-8 bottom-4 h-24 w-24 rounded-full bg-white/10"></div>
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-            <div>
-                <h2 class="text-2xl font-semibold">Analytics & Performance</h2>
-                <p class="text-sm text-white/70">Track operational health, queue pressure, and team output.</p>
+<!-- Main Content -->
+<div class="ml-64">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-surface-container-lowest/95 backdrop-blur-sm border-b border-outline-variant">
+        <div class="flex justify-between items-center h-16 px-6">
+            <div class="relative w-full max-w-md">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
+                <input type="text" class="kinetic-input pl-10" placeholder="Search tickets, projects, or users...">
             </div>
-            <div class="flex gap-2">
-                <div class="bg-white/10 border border-white/20 px-3 py-2 rounded-lg text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">calendar_today</span>Oct 1 - Oct 31, 2023
-                </div>
-                <button class="bg-white text-primary px-3 py-2 rounded-lg text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">download</span>Export PDF
+            <div class="flex items-center gap-3">
+                <button class="p-2 rounded-full hover:bg-surface-container-high transition">
+                    <span class="material-symbols-outlined text-on-surface-variant text-base">notifications</span>
                 </button>
+                <div class="flex items-center gap-2 pl-3 border-l border-outline-variant">
+                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm">account_circle</span>
+                    </div>
+                    <span class="text-sm font-medium text-on-surface" th:text="${#authentication.principal.fullName}">Admin User</span>
+                </div>
             </div>
         </div>
-    </section>
+    </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 my-6">
-        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
-            <p class="text-xs text-on-surface-variant">Total Users</p>
-            <h3 class="text-3xl font-semibold" th:text="${totalUsers}">0</h3>
-            <p class="text-xs text-on-surface-variant mt-1" th:text="${adminCount} + ' admins, ' + ${supportCount} + ' support'">0 admins, 0 support</p>
+    <!-- Main Content Area -->
+    <main class="p-6">
+        <!-- Hero Section -->
+        <div class="kinetic-card p-6 mb-6 bg-gradient-to-r from-primary to-primary-container text-white" style="background: linear-gradient(135deg, #091426 0%, #1e293b 100%);">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="headline-lg text-white">Analytics & Performance</h1>
+                    <p class="text-sm text-white/70 mt-1">Track operational health, queue pressure, and team output.</p>
+                </div>
+                <div class="flex gap-2">
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">calendar_today</span>
+                        <span>Oct 1 - Oct 31, 2025</span>
+                    </div>
+                    <button class="bg-white text-primary px-3 py-2 rounded-lg text-sm flex items-center gap-2 font-medium hover:bg-gray-100 transition">
+                        <span class="material-symbols-outlined text-sm">download</span>
+                        Export
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
-            <p class="text-xs text-on-surface-variant">Projects</p>
-            <h3 class="text-3xl font-semibold" th:text="${totalProjects}">0</h3>
-            <p class="text-xs text-on-surface-variant mt-1">Active workspaces</p>
-        </div>
-        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
-            <p class="text-xs text-on-surface-variant">Open Tickets</p>
-            <h3 class="text-3xl font-semibold" th:text="${openTicketCount}">0</h3>
-            <p class="text-xs text-on-surface-variant mt-1">Needs attention</p>
-        </div>
-        <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
-            <p class="text-xs text-on-surface-variant">Resolved</p>
-            <h3 class="text-3xl font-semibold" th:text="${resolvedTicketCount}">0</h3>
-            <p class="text-xs text-on-surface-variant mt-1">Closed this month</p>
-        </div>
-    </div>
 
-    <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant chart-grid">
-            <h3 class="text-sm font-semibold mb-4">Ticket Volume Over Time</h3>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white/70 border border-outline-variant rounded-lg p-4">
-                    <p class="text-xs text-on-surface-variant">Open</p>
-                    <p class="text-2xl font-semibold" th:text="${openTicketCount}">0</p>
-                </div>
-                <div class="bg-white/70 border border-outline-variant rounded-lg p-4">
-                    <p class="text-xs text-on-surface-variant">In Progress</p>
-                    <p class="text-2xl font-semibold" th:text="${inProgressTicketCount}">0</p>
-                </div>
-                <div class="bg-white/70 border border-outline-variant rounded-lg p-4">
-                    <p class="text-xs text-on-surface-variant">Resolved</p>
-                    <p class="text-2xl font-semibold" th:text="${resolvedTicketCount}">0</p>
-                </div>
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="kinetic-stat-card">
+                <span class="label-md text-on-surface-variant">Total Users</span>
+                <p class="text-3xl font-bold text-primary mt-2" th:text="${totalUsers}">1,284</p>
+                <p class="text-xs text-on-surface-variant mt-1">
+                    <span th:text="${adminCount}">12</span> admins, <span th:text="${supportCount}">48</span> support
+                </p>
             </div>
-            <div class="h-28"></div>
-        </div>
-        <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
-            <h3 class="text-sm font-semibold mb-4">User Distribution</h3>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between text-sm">
-                    <span>Customers</span>
-                    <span class="font-semibold" th:text="${customerCount}">0</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                    <span>Support</span>
-                    <span class="font-semibold" th:text="${supportCount}">0</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                    <span>Admins</span>
-                    <span class="font-semibold" th:text="${adminCount}">0</span>
-                </div>
-                <div class="mt-4 text-xs text-on-surface-variant">Roles reflect active accounts.</div>
+            <div class="kinetic-stat-card">
+                <span class="label-md text-on-surface-variant">Projects</span>
+                <p class="text-3xl font-bold text-primary mt-2" th:text="${totalProjects}">47</p>
+                <p class="text-xs text-on-surface-variant mt-1">Active workspaces</p>
+            </div>
+            <div class="kinetic-stat-card">
+                <span class="label-md text-on-surface-variant">Open Tickets</span>
+                <p class="text-3xl font-bold text-primary mt-2" th:text="${openTicketCount}">132</p>
+                <p class="text-xs text-on-surface-variant mt-1">Needs attention</p>
+            </div>
+            <div class="kinetic-stat-card">
+                <span class="label-md text-on-surface-variant">Resolved</span>
+                <p class="text-3xl font-bold text-primary mt-2" th:text="${resolvedTicketCount}">1,024</p>
+                <p class="text-xs text-on-surface-variant mt-1">Closed this month</p>
             </div>
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
-            <div class="flex items-center justify-between p-4 border-b border-outline-variant">
-                <h3 class="text-sm font-semibold">Latest Tickets</h3>
-                <a class="text-sm text-secondary" href="/tickets">View queue</a>
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Ticket Volume Card -->
+            <div class="kinetic-card lg:col-span-2 p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-secondary">show_chart</span>
+                    <h3 class="headline-md">Ticket Volume</h3>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-surface-container-low rounded-lg p-3">
+                        <p class="label-md text-on-surface-variant">Open</p>
+                        <p class="text-2xl font-bold text-primary" th:text="${openTicketCount}">132</p>
+                    </div>
+                    <div class="bg-surface-container-low rounded-lg p-3">
+                        <p class="label-md text-on-surface-variant">In Progress</p>
+                        <p class="text-2xl font-bold text-primary" th:text="${inProgressTicketCount}">64</p>
+                    </div>
+                    <div class="bg-surface-container-low rounded-lg p-3">
+                        <p class="label-md text-on-surface-variant">Resolved</p>
+                        <p class="text-2xl font-bold text-primary" th:text="${resolvedTicketCount}">1,024</p>
+                    </div>
+                </div>
+                <!-- Mini chart bars -->
+                <div>
+                    <p class="label-md text-on-surface-variant mb-3">Weekly Trend</p>
+                    <div class="flex items-end space-x-2 h-32">
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 60px;"></div>
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 85px;"></div>
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 45px;"></div>
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 95px;"></div>
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 70px;"></div>
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 55px;"></div>
+                        <div class="flex-1 bg-secondary/50 rounded-t-md" style="height: 80px;"></div>
+                    </div>
+                    <div class="flex justify-between mt-2">
+                        <span class="text-xs text-on-surface-variant">Mon</span>
+                        <span class="text-xs text-on-surface-variant">Tue</span>
+                        <span class="text-xs text-on-surface-variant">Wed</span>
+                        <span class="text-xs text-on-surface-variant">Thu</span>
+                        <span class="text-xs text-on-surface-variant">Fri</span>
+                        <span class="text-xs text-on-surface-variant">Sat</span>
+                        <span class="text-xs text-on-surface-variant">Sun</span>
+                    </div>
+                </div>
             </div>
-            <div class="divide-y divide-outline-variant">
-                <div class="p-4" th:each="ticket, iter : ${allTickets}" th:if="${iter.index < 6}">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-semibold" th:text="${ticket.title}">Ticket title</p>
-                            <p class="text-xs text-on-surface-variant" th:text="'TK-' + ${ticket.id} + ' • ' + ${ticket.reporter.fullName}">Ticket meta</p>
+
+            <!-- User Distribution Card -->
+            <div class="kinetic-card p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-secondary">pie_chart</span>
+                    <h3 class="headline-md">User Distribution</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-outline-variant">
+                        <span class="body-md text-on-surface-variant">Customers</span>
+                        <span class="font-semibold text-primary" th:text="${customerCount}">1,224</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-outline-variant">
+                        <span class="body-md text-on-surface-variant">Support Agents</span>
+                        <span class="font-semibold text-primary" th:text="${supportCount}">48</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="body-md text-on-surface-variant">Administrators</span>
+                        <span class="font-semibold text-primary" th:text="${adminCount}">12</span>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-outline-variant">
+                    <div class="bg-surface-container-low rounded-lg p-3">
+                        <p class="text-xs text-on-surface-variant text-center">Total active accounts: <span class="font-semibold" th:text="${totalUsers}">1,284</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Tickets -->
+            <div class="kinetic-card overflow-hidden">
+                <div class="flex justify-between items-center p-4 border-b border-outline-variant">
+                    <h3 class="headline-md">Recent Tickets</h3>
+                    <a href="/tickets" class="text-secondary text-sm font-medium hover:underline flex items-center gap-1">
+                        View all
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+                <div class="divide-y divide-outline-variant">
+                    <div th:each="ticket, iter : ${recentTickets}" th:if="${iter.index < 5}" class="p-4 hover:bg-surface-container-low transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <p class="font-semibold text-on-surface" th:text="${ticket.title}">Sample Ticket</p>
+                                <p class="text-xs text-on-surface-variant mt-1">
+                                    #<span th:text="${ticket.id}">123</span> • 
+                                    <span th:text="${ticket.reporter != null ? ticket.reporter.fullName : 'Unknown'}">User</span>
+                                </p>
+                            </div>
+                            <span class="status-badge" th:classappend="${ticket.status == 'OPEN' ? 'bg-error/10 text-error' : (ticket.status == 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800')}">
+                                <span class="w-1.5 h-1.5 rounded-full" th:classappend="${ticket.status == 'OPEN' ? 'bg-error' : (ticket.status == 'IN_PROGRESS' ? 'bg-blue-600' : 'bg-green-600')}"></span>
+                                <span th:text="${ticket.status}">OPEN</span>
+                            </span>
                         </div>
-                        <div class="text-xs text-on-surface-variant" th:text="${ticket.status.name()}">OPEN</div>
+                    </div>
+                    <div th:if="${recentTickets == null or recentTickets.isEmpty()}" class="p-8 text-center">
+                        <span class="material-symbols-outlined text-3xl text-on-surface-variant">inbox</span>
+                        <p class="text-sm text-on-surface-variant mt-2">No recent tickets</p>
                     </div>
                 </div>
-                <div class="p-6 text-sm text-on-surface-variant" th:if="${allTickets.isEmpty()}">No tickets created yet.</div>
             </div>
-        </div>
-        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
-            <div class="flex items-center justify-between p-4 border-b border-outline-variant">
-                <h3 class="text-sm font-semibold">New Users</h3>
-                <a class="text-sm text-secondary" href="/users">Manage users</a>
-            </div>
-            <div class="divide-y divide-outline-variant">
-                <div class="p-4 flex items-center justify-between" th:each="user, iter : ${allUsers}" th:if="${iter.index < 6}">
-                    <div>
-                        <p class="text-sm font-semibold" th:text="${user.fullName}">User Name</p>
-                        <p class="text-xs text-on-surface-variant" th:text="${user.email}">user@email.com</p>
-                    </div>
-                    <span class="text-xs" th:text="${user.role.name()}">CUSTOMER</span>
-                </div>
-                <div class="p-6 text-sm text-on-surface-variant" th:if="${allUsers.isEmpty()}">No users found.</div>
-            </div>
-        </div>
-    </div>
 
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl mt-6 overflow-hidden">
-        <div class="flex items-center justify-between p-4 border-b border-outline-variant">
-            <h3 class="text-sm font-semibold">Projects Overview</h3>
-            <a class="text-sm text-secondary" href="/projects">View projects</a>
+            <!-- Recent Users -->
+            <div class="kinetic-card overflow-hidden">
+                <div class="flex justify-between items-center p-4 border-b border-outline-variant">
+                    <h3 class="headline-md">Recent Users</h3>
+                    <a href="/users" class="text-secondary text-sm font-medium hover:underline flex items-center gap-1">
+                        Manage users
+                        <span class="material-symbols-outlined text-sm">manage_accounts</span>
+                    </a>
+                </div>
+                <div class="divide-y divide-outline-variant">
+                    <div th:each="user, iter : ${recentUsers}" th:if="${iter.index < 5}" class="p-4 hover:bg-surface-container-low transition">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-on-surface" th:text="${user.fullName}">User Name</p>
+                                <p class="text-xs text-on-surface-variant" th:text="${user.email}">user@example.com</p>
+                            </div>
+                            <span class="status-badge" th:classappend="${user.role == 'ADMIN' ? 'bg-error/10 text-error' : (user.role == 'CUSTOMER_SUPPORT' ? 'bg-blue-100 text-blue-800' : 'bg-surface-container-high text-on-surface-variant')}">
+                                <span th:text="${user.role}">USER</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div th:if="${recentUsers == null or recentUsers.isEmpty()}" class="p-8 text-center">
+                        <span class="material-symbols-outlined text-3xl text-on-surface-variant">group_off</span>
+                        <p class="text-sm text-on-surface-variant mt-2">No recent users</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <table class="w-full text-sm">
-            <thead class="bg-surface-container-low">
-                <tr class="text-left">
-                    <th class="p-3">Project</th>
-                    <th class="p-3">Description</th>
-                    <th class="p-3">Tickets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-t border-outline-variant" th:each="project, iter : ${projects}" th:if="${iter.index < 6}">
-                    <td class="p-3" th:text="${project.name}">Project</td>
-                    <td class="p-3 text-on-surface-variant" th:text="${project.description}">Desc</td>
-                    <td class="p-3" th:text="${project.tickets.size()}">0</td>
-                </tr>
-                <tr th:if="${projects.isEmpty()}">
-                    <td colspan="3" class="p-6 text-center text-on-surface-variant">No projects created.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</main>
+
+        <!-- Projects Table -->
+        <div class="kinetic-card mt-6 overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b border-outline-variant">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">folder_special</span>
+                    <h3 class="headline-md">Active Projects</h3>
+                </div>
+                <a href="/projects" class="text-secondary text-sm font-medium hover:underline flex items-center gap-1">
+                    View all projects
+                    <span class="material-symbols-outlined text-sm">launch</span>
+                </a>
+            </div>
+            <table class="kinetic-table">
+                <thead>
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Description</th>
+                        <th>Tickets</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="project, iter : ${projects}" th:if="${iter.index < 5}">
+                        <td class="font-semibold" th:text="${project.name}">Project Name</td>
+                        <td class="text-on-surface-variant" th:text="${project.description}">Description</td>
+                        <td th:text="${project.tickets != null ? project.tickets.size() : 0}">0</td>
+                        <td>
+                            <span class="status-badge bg-green-100 text-green-800">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>
+                                Active
+                            </span>
+                        </td>
+                    </tr>
+                    <tr th:if="${projects == null or projects.isEmpty()}">
+                        <td colspan="4" class="text-center py-8 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-3xl">folder_empty</span>
+                            <p class="mt-2">No projects created yet</p>
+                            <a href="/projects/new" class="kinetic-btn-primary mt-3 text-sm inline-flex">Create project</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
 </body>
 </html>

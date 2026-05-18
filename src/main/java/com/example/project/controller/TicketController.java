@@ -13,6 +13,7 @@ import com.example.project.repository.ProjectRepository;
 import com.example.project.repository.TicketRepository;
 import com.example.project.service.TicketService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -51,6 +52,7 @@ public class TicketController {
     }
 
     @GetMapping("/new")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public String showCreateForm(Model model) {
         AppUser currentUser = getCurrentUser();
         model.addAttribute("ticket", new Ticket());
@@ -107,6 +109,7 @@ public class TicketController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('CUSTOMER')")
     public String create(@RequestParam String title,
                         @RequestParam String description,
                         @RequestParam Long projectId,
@@ -132,6 +135,7 @@ public class TicketController {
     }
 
     @PostMapping("/{id}/update")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
     public String update(@PathVariable Long id,
                         @RequestParam String title,
                         @RequestParam String description,
@@ -168,7 +172,41 @@ public class TicketController {
         }
     }
 
+    @PostMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
+    public String changeStatus(@PathVariable Long id,
+                               @RequestParam TicketStatus status,
+                               Model model) {
+        try {
+            AppUser currentUser = getCurrentUser();
+            ticketService.changeStatus(id, currentUser, status);
+            return "redirect:/tickets/" + id;
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/tickets/" + id;
+        }
+    }
+
+    @PostMapping("/{id}/resolve")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
+    public String resolve(@PathVariable Long id,
+                           @RequestParam(required = false) String message,
+                           Model model) {
+        try {
+            AppUser currentUser = getCurrentUser();
+            if (message != null && !message.trim().isEmpty()) {
+                ticketService.addReply(id, currentUser, message.trim());
+            }
+            ticketService.changeStatus(id, currentUser, TicketStatus.RESOLVED);
+            return "redirect:/tickets/" + id;
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/tickets/" + id;
+        }
+    }
+
     @PostMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ADMIN')")
     public String delete(@PathVariable Long id) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));

@@ -1,23 +1,170 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create/Edit User</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title th:text="${user != null and user.id != null ? 'Edit User · Kinetic Ops' : 'New User · Kinetic Ops'}">User Form · Kinetic Ops</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --surface: #f7f9fb;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f2f4f6;
+            --on-surface: #191c1e;
+            --on-surface-variant: #45474c;
+            --outline: #75777d;
+            --outline-variant: #c5c6cd;
+            --primary: #091426;
+            --primary-container: #1e293b;
+            --secondary: #0058be;
+            --error: #ba1a1a;
+            --radius-default: 0.25rem;
+            --radius-lg: 0.5rem;
+            --radius-md: 0.375rem;
+        }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--surface); color: var(--on-surface); }
+        .headline-lg { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em; }
+        .body-md { font-size: 14px; font-weight: 400; line-height: 20px; }
+        .label-md { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .kinetic-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            box-shadow: 0px 4px 12px rgba(30, 41, 59, 0.05);
+        }
+        .kinetic-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-default);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .kinetic-btn-primary:hover { background-color: var(--primary-container); }
+        .kinetic-btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--outline-variant);
+            color: var(--on-surface-variant);
+            border-radius: var(--radius-default);
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .kinetic-btn-secondary:hover { border-color: var(--secondary); color: var(--secondary); }
+        .kinetic-input, .kinetic-select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            background-color: white;
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .kinetic-input:focus, .kinetic-select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(0, 88, 190, 0.2);
+        }
+        .kinetic-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24; }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        .kinetic-checkbox {
+            width: 1rem;
+            height: 1rem;
+            border-radius: var(--radius-sm, 0.125rem);
+            border: 1px solid var(--outline-variant);
+            accent-color: var(--primary);
+        }
+    </style>
 </head>
-<body>
-<h1 th:if="${user.id == null}">Create User</h1>
-<h1 th:if="${user.id != null}">Edit User</h1>
+<body class="bg-surface">
 
-<form th:action="@{/users}" method="post" th:object="${user}">
-    <input type="hidden" th:field="*{id}"/>
-    
-    <label>Full Name:</label>
-    <input type="text" th:field="*{fullName}" required/><br/>
-    
-    <label>Email:</label>
-    <input type="email" th:field="*{email}" required/><br/>
-    
-    <button type="submit">Save</button>
-    <a href="/users">Cancel</a>
-</form>
+<header class="sticky top-0 z-50 bg-surface-container-lowest/95 backdrop-blur-sm border-b border-outline-variant">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-sm">KO</div>
+            <span class="text-xl font-bold tracking-tight text-primary">Kinetic<span class="font-medium text-on-surface-variant"> Ops</span></span>
+        </div>
+        <a href="/users" class="text-on-surface-variant text-sm hover:text-primary transition flex items-center gap-1">
+            <span class="material-symbols-outlined text-base">arrow_back</span> Back to users
+        </a>
+    </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+    <div class="kinetic-card p-6 md:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="material-symbols-outlined text-2xl text-secondary">person_add</span>
+            <h1 class="headline-lg text-primary" th:text="${user != null and user.id != null ? 'Edit user' : 'Create new user'}">Create new user</h1>
+        </div>
+
+        <form th:action="@{/users/save}" method="post" class="space-y-6" th:object="${user}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" th:field="*{id}" />
+
+            <div>
+                <label for="fullName" class="kinetic-label">Full name *</label>
+                <input type="text" id="fullName" th:field="*{fullName}" required class="kinetic-input" placeholder="e.g., Alex Chen">
+            </div>
+
+            <div>
+                <label for="email" class="kinetic-label">Email address *</label>
+                <input type="email" id="email" th:field="*{email}" required class="kinetic-input" placeholder="alex@kineticops.com">
+            </div>
+
+            <div th:if="${user == null or user.id == null}">
+                <label for="password" class="kinetic-label">Password *</label>
+                <input type="password" id="password" name="password" class="kinetic-input" placeholder="··········">
+                <p class="text-xs text-on-surface-variant mt-1">Minimum 8 characters for new users</p>
+            </div>
+
+            <div>
+                <label for="role" class="kinetic-label">Role</label>
+                <select id="role" th:field="*{role}" class="kinetic-select">
+                    <option value="CUSTOMER_SUPPORT">Customer Support</option>
+                    <option value="ADMIN">Administrator</option>
+                    <option value="USER">Standard User</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="checkbox-label">
+                    <input type="checkbox" th:field="*{active}" class="kinetic-checkbox">
+                    <span class="text-sm font-medium text-on-surface">Active account</span>
+                </label>
+                <p class="text-xs text-on-surface-variant mt-1 mt-1 ml-6">Inactive users cannot access the system</p>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <a href="/users" class="kinetic-btn-secondary">Cancel</a>
+                <button type="submit" class="kinetic-btn-primary">
+                    <span class="material-symbols-outlined text-base">save</span>
+                    <span th:text="${user != null and user.id != null ? 'Update user' : 'Create user'}">Create user</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
 </body>
 </html>

@@ -2,121 +2,468 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Portal - SupportHub</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kinetic Ops · Customer Portal</title>
+    <!-- Tailwind CSS + base -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter (Kinetic Ops typography) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Material Symbols (lightweight icon system) -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f7f9fb; font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        /* ----- Kinetic Ops Design System Tokens (from DESIGN.md) ----- */
+        :root {
+            --surface: #f7f9fb;
+            --surface-dim: #d8dadc;
+            --surface-bright: #f7f9fb;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f2f4f6;
+            --surface-container: #eceef0;
+            --surface-container-high: #e6e8ea;
+            --surface-container-highest: #e0e3e5;
+            --on-surface: #191c1e;
+            --on-surface-variant: #45474c;
+            --inverse-surface: #2d3133;
+            --inverse-on-surface: #eff1f3;
+            --outline: #75777d;
+            --outline-variant: #c5c6cd;
+            --surface-tint: #545f73;
+            --primary: #091426;
+            --on-primary: #ffffff;
+            --primary-container: #1e293b;
+            --on-primary-container: #8590a6;
+            --inverse-primary: #bcc7de;
+            --secondary: #0058be;
+            --on-secondary: #ffffff;
+            --secondary-container: #2170e4;
+            --on-secondary-container: #fefcff;
+            --tertiary: #041528;
+            --error: #ba1a1a;
+            --error-container: #ffdad6;
+            --on-error-container: #93000a;
+            --background: #f7f9fb;
+            --on-background: #191c1e;
+            --surface-variant: #e0e3e5;
+            --radius-sm: 0.125rem;
+            --radius-default: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-full: 9999px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background-color: var(--background);
+            color: var(--on-surface);
+            font-synthesis: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Typography classes matching design system */
+        .headline-lg {
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 32px;
+            letter-spacing: -0.01em;
+        }
+        .headline-md {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 28px;
+        }
+        .body-md {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+        }
+        .label-md {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 16px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .label-sm {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 14px;
+        }
+        .body-sm {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 18px;
+        }
+
+        /* Kinetic Ops component styles – cards, buttons, inputs, badges (shadcn inspired) */
+        .kinetic-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0px 4px 12px rgba(30, 41, 59, 0.05);
+        }
+        .kinetic-card-hoverable:hover {
+            border-color: #bcc7de;
+            box-shadow: 0px 6px 16px rgba(30, 41, 59, 0.08);
+        }
+        .kinetic-stat-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            transition: all 0.2s;
+        }
+        .kinetic-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-default);
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+        .kinetic-btn-primary:hover {
+            background-color: var(--primary-container);
+        }
+        .kinetic-btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--outline-variant);
+            color: var(--on-surface-variant);
+            font-weight: 500;
+            border-radius: var(--radius-default);
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+        .kinetic-btn-secondary:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+        .kinetic-input {
+            background-color: white;
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            font-size: 0.875rem;
+            width: 100%;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .kinetic-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(0, 88, 190, 0.2);
+        }
+        /* status badges: semantic colors, light background, bold text */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1rem;
+            letter-spacing: 0.01em;
+        }
+        .badge-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        /* Table styling (data tables with zebra stripes) */
+        .kinetic-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .kinetic-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background-color: var(--surface-container-low);
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            border-bottom: 1px solid var(--outline-variant);
+        }
+        .kinetic-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--outline-variant);
+            font-size: 0.875rem;
+        }
+        .kinetic-table tbody tr:hover {
+            background-color: var(--surface-container-low);
+        }
+        .kinetic-table tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.01);
+        }
+        /* Section headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24;
+        }
+        /* left accent border for cards (optional) */
+        .border-left-accent {
+            position: relative;
+            overflow: hidden;
+        }
+        .border-left-accent::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--secondary);
+        }
     </style>
     <script>
         tailwind.config = {
-            theme: { extend: { colors: {
-                surface: '#f7f9fb',
-                'surface-container-lowest': '#ffffff',
-                'surface-container-low': '#f2f4f6',
-                primary: '#091426',
-                secondary: '#0058be',
-                'on-surface': '#191c1e',
-                'on-surface-variant': '#45474c',
-                outline: '#75777d',
-                'outline-variant': '#c5c6cd'
-            }}}}
+            theme: {
+                extend: {
+                    colors: {
+                        surface: '#f7f9fb',
+                        'surface-container-lowest': '#ffffff',
+                        'surface-container-low': '#f2f4f6',
+                        primary: '#091426',
+                        secondary: '#0058be',
+                        'on-surface': '#191c1e',
+                        'on-surface-variant': '#45474c',
+                        outline: '#75777d',
+                        'outline-variant': '#c5c6cd',
+                        error: '#ba1a1a',
+                    },
+                    borderRadius: {
+                        'sm': '0.125rem',
+                        'DEFAULT': '0.25rem',
+                        'md': '0.375rem',
+                        'lg': '0.5rem',
+                        'xl': '0.75rem',
+                        'full': '9999px',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui'],
+                    }
+                }
+            }
         }
     </script>
 </head>
-<body class="bg-surface text-on-surface">
-<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant flex justify-between items-center h-16 px-6">
-    <div class="flex items-center gap-3">
-        <span class="text-xl font-semibold text-primary">SupportHub</span>
-    </div>
-    <div class="hidden md:flex items-center gap-6 text-sm">
-        <a class="text-secondary font-semibold border-b-2 border-secondary" href="/dashboard">Knowledge Base</a>
-        <a class="text-on-surface-variant hover:text-primary" href="/tickets">My Tickets</a>
-    </div>
-    <div class="flex items-center gap-3">
-        <a href="/tickets/new" class="bg-primary text-white px-4 py-2 rounded-lg text-sm">Submit a Ticket</a>
-        <a href="/logout" class="text-on-surface-variant text-sm">Sign out</a>
-    </div>
-</header>
-
-<main>
-    <section class="relative bg-primary py-12">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-            <h1 class="text-3xl font-semibold text-white mb-2">How can we help?</h1>
-            <p class="text-sm text-white/70 mb-6">Search our knowledge base for articles and troubleshooting tips.</p>
-            <div class="relative max-w-2xl mx-auto">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-                <input class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border-none shadow-sm" placeholder="Search for articles, keywords, or topics..." type="text">
+<body class="bg-surface text-on-surface antialiased">
+    <!-- Header with Kinetic Ops authority, no heavy shadow, composed border -->
+    <header class="sticky top-0 z-50 bg-surface-container-lowest/95 backdrop-blur-sm border-b border-outline-variant">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-sm">KO</div>
+                <span class="text-xl font-bold tracking-tight text-primary">Kinetic<span class="font-medium text-on-surface-variant"> Ops</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-sm">
+                <a href="/dashboard" class="font-semibold text-secondary border-b-2 border-secondary pb-0.5">Knowledge Base</a>
+                <a href="/tickets" class="text-on-surface-variant hover:text-primary transition">My Tickets</a>
+                <a href="/projects" class="text-on-surface-variant hover:text-primary transition">Projects</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/tickets/new" class="kinetic-btn-primary text-sm shadow-none">
+                    <span class="material-symbols-outlined text-base">add_comment</span>
+                    Submit Ticket
+                </a>
+                <a href="/logout" class="text-on-surface-variant text-sm font-medium hover:text-primary transition flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">logout</span>
+                    <span class="hidden sm:inline">Sign out</span>
+                </a>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
-                <p class="text-xs text-on-surface-variant">Total Tickets</p>
-                <p class="text-2xl font-semibold" th:text="${myTickets.size()}">0</p>
-            </div>
-            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
-                <p class="text-xs text-on-surface-variant">Open Tickets</p>
-                <p class="text-2xl font-semibold" th:text="${myOpenTickets}">0</p>
-            </div>
-            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
-                <p class="text-xs text-on-surface-variant">Resolved</p>
-                <p class="text-2xl font-semibold" th:text="${myResolvedTickets}">0</p>
-            </div>
-            <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl">
-                <p class="text-xs text-on-surface-variant">Active Projects</p>
-                <p class="text-2xl font-semibold" th:text="${projects.size()}">0</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="lg:col-span-2 bg-white border border-outline-variant rounded-xl overflow-hidden">
-                <div class="flex items-center justify-between p-4 border-b border-outline-variant">
-                    <h2 class="text-sm font-semibold">My Tickets</h2>
-                    <a href="/tickets/new" class="text-sm text-secondary">New Ticket</a>
+    <main>
+        <!-- Hero section with primary gradient (composed, authoritative) -->
+        <section class="relative bg-primary py-10 md:py-14 overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-container/20 via-transparent to-transparent"></div>
+            <div class="max-w-4xl mx-auto px-4 text-center relative">
+                <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-2">How can we help?</h1>
+                <p class="text-white/70 body-md mb-6">Search our knowledge base for articles, troubleshooting, and best practices.</p>
+                <div class="relative max-w-2xl mx-auto">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70">search</span>
+                    <input type="text" class="kinetic-input pl-10 pr-4 py-3 rounded-xl bg-white border-none shadow-sm focus:ring-2 focus:ring-secondary/30" placeholder="Search for articles, keywords, or topics...">
                 </div>
-                <table class="w-full text-sm">
-                    <thead class="bg-surface-container-low">
-                        <tr class="text-left">
-                            <th class="p-3">ID</th>
-                            <th class="p-3">Title</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3">Priority</th>
-                            <th class="p-3">Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="ticket, iter : ${myTickets}" th:if="${iter.index < 6}" class="border-t border-outline-variant hover:bg-surface-container-low">
-                            <td class="p-3" th:text="'#' + ${ticket.id}"></td>
-                            <td class="p-3" th:text="${ticket.title}"></td>
-                            <td class="p-3" th:text="${ticket.status.name()}"></td>
-                            <td class="p-3" th:text="${ticket.priority.name()}"></td>
-                            <td class="p-3" th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy')}"></td>
-                        </tr>
-                        <tr th:if="${myTickets.isEmpty()}">
-                            <td colspan="5" class="p-6 text-center text-on-surface-variant">No tickets yet.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            </div>
+        </section>
+
+        <!-- Main dashboard content: metrics grid + tickets + projects -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+            <!-- KPI Row (4 cards) system fluid spacing -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="kinetic-stat-card p-4 hover:border-secondary/40 transition">
+                    <p class="label-md text-on-surface-variant mb-1">Total Tickets</p>
+                    <p class="text-3xl font-bold text-primary" th:text="${myTickets != null ? myTickets.size() : 0}">0</p>
+                </div>
+                <div class="kinetic-stat-card p-4 hover:border-secondary/40 transition">
+                    <p class="label-md text-on-surface-variant mb-1">Open Tickets</p>
+                    <p class="text-3xl font-bold text-primary" th:text="${myOpenTickets != null ? myOpenTickets : 0}">0</p>
+                </div>
+                <div class="kinetic-stat-card p-4 hover:border-secondary/40 transition">
+                    <p class="label-md text-on-surface-variant mb-1">Resolved</p>
+                    <p class="text-3xl font-bold text-primary" th:text="${myResolvedTickets != null ? myResolvedTickets : 0}">0</p>
+                </div>
+                <div class="kinetic-stat-card p-4 hover:border-secondary/40 transition">
+                    <p class="label-md text-on-surface-variant mb-1">Active Projects</p>
+                    <p class="text-3xl font-bold text-primary" th:text="${projects != null ? projects.size() : 0}">0</p>
+                </div>
             </div>
 
-            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                <h3 class="text-sm font-semibold mb-4">Featured Projects</h3>
-                <div class="space-y-3 text-sm">
-                    <div th:each="project, iter : ${projects}" th:if="${iter.index < 5}">
-                        <p class="font-semibold" th:text="${project.name}">Project</p>
-                        <p class="text-xs text-on-surface-variant" th:text="${project.description}">Description</p>
+            <!-- Two column layout: Recent Tickets (left) + Featured Projects / right rail -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left + Center combined (tickets table) occupies 2/3 on desktop -->
+                <div class="lg:col-span-2 kinetic-card overflow-hidden">
+                    <div class="section-header">
+                        <h2 class="headline-md text-on-surface">My Tickets</h2>
+                        <a href="/tickets/new" class="kinetic-btn-secondary text-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base">add_circle</span> New Ticket
+                        </a>
                     </div>
-                    <p class="text-on-surface-variant" th:if="${projects.isEmpty()}">No projects available.</p>
+                    <div class="overflow-x-auto">
+                        <table class="kinetic-table min-w-[480px]">
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Title / Subject</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic loop for myTickets (Thymeleaf) with design system badges -->
+                                <tr th:each="ticket, iter : ${myTickets}" th:if="${iter.index < 6}">
+                                    <td class="font-mono text-xs font-medium" th:text="'#' + ${ticket.id}">#T-1001</td>
+                                    <td class="font-medium max-w-[200px] truncate" th:text="${ticket.title}">Unable to access admin panel</td>
+                                    <td>
+                                        <span class="badge-status" th:classappend="${ticket.status?.name() == 'OPEN' ? 'bg-error/10 text-error' : (ticket.status?.name() == 'RESOLVED' ? 'bg-green-100 text-green-800' : 'bg-surface-container-high text-on-surface-variant')}">
+                                            <span class="w-1.5 h-1.5 rounded-full" th:classappend="${ticket.status?.name() == 'OPEN' ? 'bg-error' : (ticket.status?.name() == 'RESOLVED' ? 'bg-green-600' : 'bg-primary')}"></span>
+                                            <span th:text="${ticket.status?.name()}">OPEN</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="badge-priority">
+                                            <span class="priority-dot" th:classappend="${ticket.priority?.name() == 'URGENT' ? 'bg-error' : (ticket.priority?.name() == 'HIGH' ? 'bg-orange-500' : 'bg-primary/60')}"></span>
+                                            <span th:text="${ticket.priority?.name()}">Medium</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-on-surface-variant body-sm" th:text="${#temporals?.format(ticket.createdAt, 'MMM dd, yyyy')}">Apr 12, 2025</td>
+                                </tr>
+                                <tr th:if="${myTickets == null or myTickets.isEmpty()}">
+                                    <td colspan="5" class="text-center py-10 text-on-surface-variant">
+                                        <span class="material-symbols-outlined text-3xl mb-1">inbox</span>
+                                        <p class="body-md">No support tickets yet. Submit your first request.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="border-t border-outline-variant p-3 text-right bg-surface-container-low/30" th:if="${myTickets != null and myTickets.size() > 5}">
+                        <a href="/tickets" class="text-sm text-secondary font-medium hover:underline">View all tickets →</a>
+                    </div>
+                </div>
+
+                <!-- Right Rail (25% metadata equivalent) - Featured Projects + quick actions -->
+                <div class="space-y-6">
+                    <!-- Featured projects card -->
+                    <div class="kinetic-card p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="headline-md text-base font-semibold tracking-tight">Featured Projects</h3>
+                            <span class="material-symbols-outlined text-on-surface-variant text-base">folder_special</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div th:each="project, iter : ${projects}" th:if="${iter.index < 4}" class="border-b border-outline-variant last:border-0 pb-3 last:pb-0">
+                                <p class="font-semibold text-sm flex items-center gap-1.5" th:text="${project.name}">Platform Migration</p>
+                                <p class="text-xs text-on-surface-variant line-clamp-2 mt-1" th:text="${project.description}">Cloud infrastructure upgrade and performance monitoring initiative.</p>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <span class="text-[11px] font-medium bg-surface-container-high px-2 py-0.5 rounded-full">Active</span>
+                                    <span class="text-[11px] text-on-surface-variant">Updated recently</span>
+                                </div>
+                            </div>
+                            <div th:if="${projects == null or projects.isEmpty()}" class="text-center py-4 text-on-surface-variant body-sm">
+                                <span class="material-symbols-outlined text-2xl">work</span>
+                                <p>No active projects</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-2">
+                            <a href="/projects" class="text-secondary text-sm font-medium inline-flex items-center gap-1">Browse all projects <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Quick actions / Knowledge base highlights (shadcn inspired card) -->
+                    <div class="kinetic-card p-5 bg-surface-container-low/40">
+                        <h3 class="text-sm font-semibold uppercase tracking-wide text-secondary mb-3">Knowledge shortcuts</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition">
+                                <span class="material-symbols-outlined text-sm">description</span>
+                                <a href="#" class="hover:underline">Getting started guide</a>
+                            </li>
+                            <li class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition">
+                                <span class="material-symbols-outlined text-sm">build</span>
+                                <a href="#" class="hover:underline">Troubleshooting common issues</a>
+                            </li>
+                            <li class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition">
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                                <a href="#" class="hover:underline">System status & uptime</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Support meta block - CRM-like metadata (design system right rail suggestion) -->
+                    <div class="kinetic-card p-5 border-l-4 border-secondary">
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-secondary">support_agent</span>
+                            <div>
+                                <p class="text-sm font-semibold">Priority Support SLA</p>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Response within 2h for urgent tickets. 24/7 coverage for enterprise.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional row for recent updates or knowledge grid (optional, but consistent spacing) -->
+            <div class="mt-8 pt-2 border-t border-outline-variant/60">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex items-center gap-2 text-sm text-on-surface-variant">
+                        <span class="material-symbols-outlined text-base">update</span>
+                        <span>Last updated ticket activity: today at 10:32 AM</span>
+                    </div>
+                    <div class="flex justify-start sm:justify-end">
+                        <a href="/knowledge" class="text-secondary text-sm font-medium flex items-center gap-1">Explore knowledge base <span class="material-symbols-outlined text-sm">chevron_right</span></a>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-</main>
+    </main>
 </body>
 </html>

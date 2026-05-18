@@ -4,11 +4,15 @@ import com.example.project.dto.CreateCommentRequest;
 import com.example.project.model.AppUser;
 import com.example.project.model.Ticket;
 import com.example.project.model.TicketComment;
-import com.example.project.repository.AppUserRepository;
+import com.example.project.model.UserRole;
 import com.example.project.repository.TicketCommentRepository;
 import com.example.project.repository.TicketRepository;
+import com.example.project.service.TicketService;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,56 +32,56 @@ public class TicketCommentController {
 
     private final TicketCommentRepository ticketCommentRepository;
     private final TicketRepository ticketRepository;
-    private final AppUserRepository appUserRepository;
+    private final TicketService ticketService;
 
     public TicketCommentController(TicketCommentRepository ticketCommentRepository,
                                    TicketRepository ticketRepository,
-                                   AppUserRepository appUserRepository) {
+                                   TicketService ticketService) {
         this.ticketCommentRepository = ticketCommentRepository;
         this.ticketRepository = ticketRepository;
-        this.appUserRepository = appUserRepository;
+        this.ticketService = ticketService;
+    }
+
+    private AppUser getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (AppUser) auth.getPrincipal();
     }
 
     @GetMapping("/new")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
     public String showCreateForm(Model model) {
         model.addAttribute("comment", new TicketComment());
         model.addAttribute("tickets", ticketRepository.findAll());
-        model.addAttribute("users", appUserRepository.findAll());
+        model.addAttribute("currentUser", getCurrentUser());
         return "comments/form";
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
     public String getAll(Model model) {
         model.addAttribute("comments", ticketCommentRepository.findAll());
         return "comments/list";
     }
 
     @GetMapping("/ticket/{ticketId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
     public String getForTicket(@PathVariable Long ticketId, Model model) {
         model.addAttribute("comments", ticketCommentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId));
         model.addAttribute("ticketId", ticketId);
         return "comments/list-for-ticket";
     }
 
-        @PostMapping
-        public String create(@ModelAttribute CreateCommentRequest request) {
-        Ticket ticket = ticketRepository.findById(request.getTicketId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT', 'CUSTOMER')")
+    public String create(@ModelAttribute CreateCommentRequest request) {
+        AppUser author = getCurrentUser();
 
-        AppUser author = appUserRepository.findById(request.getAuthorId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found"));
-
-        TicketComment comment = TicketComment.builder()
-            .message(request.getMessage())
-            .ticket(ticket)
-            .author(author)
-            .build();
-
-        ticketCommentRepository.save(comment);
+        ticketService.addReply(request.getTicketId(), author, request.getMessage());
         return "redirect:/tickets/" + request.getTicketId();
-        }
+    }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER_SUPPORT')")
     public String delete(@PathVariable Long id) {
         if (!ticketCommentRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found");

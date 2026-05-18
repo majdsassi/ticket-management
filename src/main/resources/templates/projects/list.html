@@ -1,15 +1,167 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Projects</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kinetic Ops · Projects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --surface: #f7f9fb;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f2f4f6;
+            --surface-container: #eceef0;
+            --on-surface: #191c1e;
+            --on-surface-variant: #45474c;
+            --outline: #75777d;
+            --outline-variant: #c5c6cd;
+            --primary: #091426;
+            --primary-container: #1e293b;
+            --secondary: #0058be;
+            --error: #ba1a1a;
+            --error-container: #ffdad6;
+            --radius-default: 0.25rem;
+            --radius-lg: 0.5rem;
+            --radius-full: 9999px;
+        }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--surface); color: var(--on-surface); }
+        .headline-lg { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.01em; }
+        .headline-md { font-size: 20px; font-weight: 600; line-height: 28px; }
+        .body-md { font-size: 14px; font-weight: 400; line-height: 20px; }
+        .body-sm { font-size: 13px; font-weight: 400; line-height: 18px; }
+        .label-md { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .kinetic-card {
+            background-color: var(--surface-container-lowest);
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            box-shadow: 0px 4px 12px rgba(30, 41, 59, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .kinetic-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-default);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .kinetic-btn-primary:hover { background-color: var(--primary-container); }
+        .kinetic-btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--outline-variant);
+            color: var(--on-surface-variant);
+            border-radius: var(--radius-default);
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .kinetic-btn-secondary:hover { border-color: var(--secondary); color: var(--secondary); }
+        .kinetic-table { width: 100%; border-collapse: collapse; }
+        .kinetic-table th {
+            text-align: left;
+            padding: 0.875rem 1rem;
+            background-color: var(--surface-container-low);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            border-bottom: 1px solid var(--outline-variant);
+        }
+        .kinetic-table td { padding: 1rem; border-bottom: 1px solid var(--outline-variant); font-size: 0.875rem; }
+        .kinetic-table tbody tr:hover { background-color: var(--surface-container-low); }
+        .kinetic-table tbody tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.01); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24; }
+    </style>
 </head>
-<body>
-<h1>Projects</h1>
-<a href="/projects/new">Create project</a>
-<ul>
-    <li th:each="p : ${projects}">
-        <a th:href="@{'/projects/' + ${p.id}}" th:text="${p.name}"></a>
-    </li>
-</ul>
+<body class="bg-surface">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-surface-container-lowest/95 backdrop-blur-sm border-b border-outline-variant">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-sm">KO</div>
+            <span class="text-xl font-bold tracking-tight text-primary">Kinetic<span class="font-medium text-on-surface-variant"> Ops</span></span>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-sm">
+            <a href="/dashboard" class="text-on-surface-variant hover:text-primary transition">Dashboard</a>
+            <a href="/tickets" class="text-on-surface-variant hover:text-primary transition">Tickets</a>
+            <a href="/projects" class="font-semibold text-secondary border-b-2 border-secondary pb-0.5">Projects</a>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/projects/new" class="kinetic-btn-primary text-sm">
+                <span class="material-symbols-outlined text-base">add_circle</span> New Project
+            </a>
+            <a href="/logout" class="text-on-surface-variant text-sm font-medium">Sign out</a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <h1 class="headline-lg text-primary">Projects</h1>
+            <p class="body-sm text-on-surface-variant mt-1">Manage active workspaces and track progress.</p>
+        </div>
+        <a href="/projects/new" class="kinetic-btn-primary">
+            <span class="material-symbols-outlined text-base">add_circle</span> Create project
+        </a>
+    </div>
+
+    <div class="kinetic-card overflow-hidden">
+        <div class="px-5 py-3 border-b border-outline-variant bg-surface-container-low/30">
+            <div class="flex items-center justify-between">
+                <span class="label-md text-secondary">All projects</span>
+                <span class="text-xs text-on-surface-variant" th:text="${projects != null ? projects.size() : 0} + ' total'">0 total</span>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="kinetic-table min-w-[640px]">
+                <thead>
+                    <tr>
+                        <th>Project name</th>
+                        <th>Description</th>
+                        <th>Created</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="project : ${projects}">
+                        <td class="font-semibold">
+                            <a th:href="@{'/projects/' + ${project.id}}" class="hover:text-secondary transition" th:text="${project.name}">Project Name</a>
+                         </td>
+                        <td class="text-on-surface-variant max-w-md truncate" th:text="${project.description != null ? project.description : 'No description'}">Description</td>
+                        <td class="text-sm text-on-surface-variant" th:text="${#temporals?.format(project.createdAt, 'MMM dd, yyyy')} ?: 'N/A'">Apr 10, 2025</td>
+                        <td class="text-right">
+                            <div class="flex justify-end gap-2">
+                                <a th:href="@{'/projects/' + ${project.id}}" class="text-secondary hover:bg-surface-container-high p-1.5 rounded-md transition inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">visibility</span> View
+                                </a>
+                                <a th:href="@{'/projects/' + ${project.id} + '/edit'}" class="text-on-surface-variant hover:bg-surface-container-high p-1.5 rounded-md transition inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">edit</span> Edit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${projects == null or projects.isEmpty()}">
+                        <td colspan="4" class="text-center py-12 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl mb-2">folder_empty</span>
+                            <p class="body-md">No projects created yet.</p>
+                            <a href="/projects/new" class="kinetic-btn-primary mt-3 text-sm inline-flex">Create your first project</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
 </body>
 </html>

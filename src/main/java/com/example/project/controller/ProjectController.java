@@ -6,6 +6,7 @@ import com.example.project.repository.ProjectRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,6 +30,7 @@ public class ProjectController {
     }
 
     @GetMapping("/new")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showCreateForm(Model model) {
         model.addAttribute("project", new Project());
         return "projects/form";
@@ -49,6 +51,7 @@ public class ProjectController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String create(@ModelAttribute Project request) {
         request.setId(null);
         projectRepository.save(request);
@@ -56,6 +59,7 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String update(@PathVariable Long id, @ModelAttribute Project request) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
@@ -67,6 +71,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String delete(@PathVariable Long id) {
         if (!projectRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");

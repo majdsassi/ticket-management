@@ -2,6 +2,7 @@ package com.example.project.controller;
 
 import com.example.project.model.UserRole;
 import com.example.project.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,12 +29,14 @@ public class AuthController {
     }
 
     @GetMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public String registerPage(Model model) {
         model.addAttribute("roles", UserRole.values());
         return "auth/register";
     }
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public String register(
             @RequestParam String fullName,
             @RequestParam String email,
