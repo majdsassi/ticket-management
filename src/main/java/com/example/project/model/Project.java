@@ -22,7 +22,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "projects")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor

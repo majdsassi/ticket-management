@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ticket_comments")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor

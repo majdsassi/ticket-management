@@ -30,7 +30,6 @@ import java.util.List;
 @Table(name = "app_users", uniqueConstraints = {
         @UniqueConstraint(name = "uk_app_user_email", columnNames = "email")
 })
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor
